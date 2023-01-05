@@ -16,17 +16,10 @@ export default function Graph() {
   const [links, setLinks] = useState([]);
   const [hover, setHover] = useState();
 
+  // Typedef here so we get intellisense on `graphRef.current` elsewhere
   /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
   const graphRef = useRef();
   const navigate = useNavigate();
-
-  // Utility function for painting rings.
-  const paintRing = useCallback((node, color, ctx, radius) => {
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    ctx.arc(node.x, node.y, radius, 0, Math.PI * 2, false);
-    ctx.fill();
-  }, []);
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
@@ -51,6 +44,13 @@ export default function Graph() {
   // NOTE: This must be separate from the previous effect, because otherwise
   // the graph gets redrawn from scratch upon closing a node window.
   useEffect(() => {
+    function paintRing(node, color, ctx, radius) {
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(node.x, node.y, radius, 0, Math.PI * 2, false);
+      ctx.fill();
+    }
+
     graphRef.current
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
@@ -77,7 +77,7 @@ export default function Graph() {
       .onNodeClick((node) => {
         navigate(`${node.id}/${node.title.replace(" ", "-")}`);
       });
-  }, [graphRef, hover, navigate, paintRing]);
+  }, [graphRef, hover, navigate]);
 
   // Update graph on changes.
   useEffect(() => {
