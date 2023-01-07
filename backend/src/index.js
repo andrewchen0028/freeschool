@@ -1,8 +1,8 @@
 const cors = require("cors");
 const express = require("express");
 
-const { Node, Link, Resource } = require("./models/index");
 const sequelize = require("./util/db");
+const { Node, Link, Resource } = require("./models/index");
 
 const app = express();
 app.use(express.json());
@@ -10,7 +10,11 @@ app.use(cors());
 
 app.get("/", function getGraph(_, response) {
   Promise.all([
-    Node.findAll({ logging: false }),
+    Node.findAll({ logging: false }).then((nodes) => {
+      return nodes.map((node) => ({
+        id: node.nodeId
+      }));
+    }),
     Link.findAll({ logging: false }).then((links) => {
       return links.map((link) => ({
         id: link.id,
@@ -23,13 +27,24 @@ app.get("/", function getGraph(_, response) {
   });
 });
 
-app.get("/:id/:title", function getNodeWindow(request, response) {
+app.get("/:nodeId", function getNodeWindow(request, response) {
   Resource.findAll({
-    where: { nodeId: request.params.id },
+    where: { nodeId: request.params.nodeId },
     logging: false
   }).then((resources) => {
     return response.json(resources).status(200).end();
-  })
+  });
+});
+
+// DEBUG ONLY
+// TODO: implement error handling for duplicate resources within the same node
+app.post("/:nodeId/resource", function postResource(request, response) {
+  Resource.create({
+    resourceId: "Resource-E",
+    nodeId: request.params.nodeId
+  }).then(() => {
+    return response.status(200).end();
+  });
 });
 
 // DEBUG ONLY
@@ -40,17 +55,20 @@ app.delete("/", async function resetDatabase(_, response) {
   await sequelize.sync({});
 
   await Node.bulkCreate([
-    { title: "Calculus 1" },
-    { title: "Calculus 2" }
+    { nodeId: "Calculus-1" },
+    { nodeId: "Calculus-2" }
   ], { logging: false });
 
-  await Link.create({ sourceNodeId: 1, targetNodeId: 2 }, { logging: false });
+  await Link.create({
+    sourceNodeId: "Calculus-1",
+    targetNodeId: "Calculus-2"
+  }, { logging: false });
 
   await Resource.bulkCreate([
-    { title: "Resource A", nodeId: 1 },
-    { title: "Resource B", nodeId: 1 },
-    { title: "Resource C", nodeId: 2 },
-    { title: "Resource D", nodeId: 2 },
+    { resourceId: "Resource-A", nodeId: "Calculus-1" },
+    { resourceId: "Resource-B", nodeId: "Calculus-1" },
+    { resourceId: "Resource-C", nodeId: "Calculus-2" },
+    { resourceId: "Resource-D", nodeId: "Calculus-2" },
   ], { logging: false });
 
   return response.status(200).end();

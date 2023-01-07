@@ -58,7 +58,7 @@ export default function Graph() {
       })
       .nodeCanvasObject((node, ctx, globalScale) => {
         const fontSize = graphRef.current.zoom() * 4 / globalScale;
-        const ringRadius = 2 + ctx.measureText(node.title).width / 2;
+        const ringRadius = 2 + ctx.measureText(node.id).width / 2;
         const ringColor = node === hover
           ? colors.neutral[400]
           : colors.neutral[300];
@@ -68,13 +68,11 @@ export default function Graph() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = colors.orange[600];
-        ctx.fillText(node.title, node.x, node.y);
+        ctx.fillText(node.id.replace("-", " "), node.x, node.y);
         node.__bckgRadius = ringRadius;
       })
       .onNodeHover((node) => { setHover(node); })
-      .onNodeClick((node) => {
-        navigate(`${node.id}/${node.title.replace(" ", "-")}`);
-      });
+      .onNodeClick((node) => { navigate(`${node.id.replace(" ", "-")}`); });
   }, [graphRef, hover, navigate]);
 
   useEffect(function redrawGraph() {

@@ -2,9 +2,14 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 
 const Resource = sequelize.define("resource", {
-  title: {
+  resourceId: {
     type: DataTypes.STRING,
-    allowNull: false,
+    primaryKey: true,
+  },
+  nodeId: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    references: { model: "nodes", key: "nodeId", },
   },
 });
 

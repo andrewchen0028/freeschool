@@ -17,7 +17,7 @@ function NodeWindowBackground() {
     <div className="w-3/5 h-screen bg-white overflow-y-scroll">
       <div className="rounded-sm bg-white m-2 p-2 shadow-md h-16
         flex items-center gap-2 text-xl font-bold">
-        <h1 className="p-2">{params.title.replace("-", " ")}</h1>
+        <h1 className="p-2">{params.id.replace("-", " ")}</h1>
       </div>
 
       <ResourceList />

@@ -2,9 +2,9 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 
 const Node = sequelize.define("node", {
-  title: {
+  nodeId: {
     type: DataTypes.STRING,
-    allowNull: false,
+    primaryKey: true,
   },
 });
 

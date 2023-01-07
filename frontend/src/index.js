@@ -11,7 +11,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Graph />}>
-        <Route path=":id/:title" element={<NodeWindow />} />
+        <Route path=":id" element={<NodeWindow />} />
       </Route>
     </Routes>
   </BrowserRouter>

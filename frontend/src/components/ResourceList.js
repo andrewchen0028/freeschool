@@ -8,7 +8,7 @@ import url from "..";
 function ResourceCard({ resource }) {
   return (
     <div className="rounded-sm bg-white m-2 p-2 shadow-md z-10">
-      {resource.title}
+      {resource.resourceId.replace("-", " ")}
     </div>
   );
 }
@@ -18,9 +18,9 @@ export default function ResourceList() {
   const params = useParams();
 
   useEffect(function initializeResourceList() {
-    axios.get(`${url}/${params.id}/${params.title}`).then((response) => {
+    axios.get(`${url}/${params.id}`).then((response) => {
       setCards(response.data.map((resource) => {
-        return <ResourceCard resource={resource} key={resource.id} />;
+        return <ResourceCard resource={resource} key={resource.resourceId} />;
       }));
     });
   }, [params.id, params.title]);
@@ -28,6 +28,9 @@ export default function ResourceList() {
   return (
     <div>
       {cards}
+      <button className="shadow-md m-2 p-2 border" onClick={async () => {
+        await axios.post(`${url}/${params.id}/resource`);
+      }}>DEBUG ONLY: post resource</button>
     </div>
   );
 }
