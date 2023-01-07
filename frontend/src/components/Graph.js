@@ -31,8 +31,7 @@ export default function Graph() {
     });
   }, []);
 
-  // Initialize graph and get data.
-  useEffect(() => {
+  useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()(document.getElementById("graph"));
     axios.get(`${url}/`).then((response) => {
       setNodes(response.data.nodes);
@@ -40,10 +39,9 @@ export default function Graph() {
     });
   }, []);
 
-  // Draw graph on initial load.
-  // NOTE: This must be separate from the previous effect, because otherwise
-  // the graph gets redrawn from scratch upon closing a node window.
-  useEffect(() => {
+  // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
+  // otherwise the graph gets redrawn from scratch upon closing a node window.
+  useEffect(function initializeGraph() {
     function paintRing(node, color, ctx, radius) {
       ctx.beginPath();
       ctx.fillStyle = color;
@@ -79,8 +77,7 @@ export default function Graph() {
       });
   }, [graphRef, hover, navigate]);
 
-  // Update graph on changes.
-  useEffect(() => {
+  useEffect(function redrawGraph() {
     if (graphRef.current) { graphRef.current.graphData({ nodes, links }); }
   }, [graphRef, nodes, links]);
 

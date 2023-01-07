@@ -17,13 +17,12 @@ export default function ResourceList() {
   const [cards, setCards] = useState([]);
   const params = useParams();
 
-  useEffect(() => {
-    axios.get(`${url}/${params.id}/${params.title}`)
-      .then((response) => {
-        setCards(response.data.map((resource) => {
-          return <ResourceCard resource={resource} key={resource.id} />;
-        }));
-      });
+  useEffect(function initializeResourceList() {
+    axios.get(`${url}/${params.id}/${params.title}`).then((response) => {
+      setCards(response.data.map((resource) => {
+        return <ResourceCard resource={resource} key={resource.id} />;
+      }));
+    });
   }, [params.id, params.title]);
 
   return (
