@@ -8,9 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Called upon opening the homepage.
-// Returns all nodes and links.
-app.get("/", (_, response) => {
+app.get("/", function getGraph(_, response) {
   Promise.all([
     Node.findAll({ logging: false }),
     Link.findAll({ logging: false }).then((links) => {
@@ -25,9 +23,7 @@ app.get("/", (_, response) => {
   });
 });
 
-// Called upon opening a node window.
-// Returns all resources for the specified node.
-app.get("/:id/:title", (request, response) => {
+app.get("/:id/:title", function getNodeWindow(request, response) {
   Resource.findAll({
     where: { nodeId: request.params.id },
     logging: false
@@ -36,8 +32,8 @@ app.get("/:id/:title", (request, response) => {
   })
 });
 
-// Reset database. (DEBUG ONLY)
-app.delete("/", async (_, response) => {
+// DEBUG ONLY
+app.delete("/", async function resetDatabase(_, response) {
   await Node.drop({ cascade: true, logging: false });
   await Link.drop({ cascade: true, logging: false });
   await Resource.drop({ cascade: true, logging: false });
