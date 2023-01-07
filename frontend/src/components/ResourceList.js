@@ -1,36 +1,69 @@
-
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import url from "..";
 
 function ResourceCard({ resource }) {
   return (
-    <div className="rounded-sm bg-white m-2 p-2 shadow-md z-10">
+    <div className="card z-10">
       {resource.resourceId.replace("-", " ")}
     </div>
   );
 }
 
+function ResourceForm({ reload }) {
+  const [resourceId, setResourceId] = useState("");
+  const [duplicateFlag, setDuplicateFlag] = useState(false);
+  const params = useParams();
+
+  function handleChange(event) {
+    setResourceId(event.target.value);
+    setDuplicateFlag(false);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    axios.post(`${url}/${params.nodeId}/resources`, {
+      resourceId: resourceId.replace(" ", "-")
+    }).then(() => {
+      setResourceId("");
+      reload();
+    }).catch(() => { setDuplicateFlag(true); });
+  }
+
+  return (
+    <div>
+      {duplicateFlag && <h2>Resource name taken</h2>}
+      <form onSubmit={handleSubmit}>
+        <input className="card" placeholder="Title" value={resourceId}
+          onChange={handleChange} />
+        <button className="button" type="submit">Submit</button>
+      </form>
+    </div>
+  );
+
+}
+
+
 export default function ResourceList() {
   const [cards, setCards] = useState([]);
   const params = useParams();
 
-  useEffect(function initializeResourceList() {
-    axios.get(`${url}/${params.id}`).then((response) => {
+  const reload = useCallback(() => {
+    axios.get(`${url}/${params.nodeId}`).then((response) => {
       setCards(response.data.map((resource) => {
         return <ResourceCard resource={resource} key={resource.resourceId} />;
       }));
     });
-  }, [params.id, params.title]);
+  }, [params.nodeId]);
+
+  useEffect(reload, [reload]);
 
   return (
     <div>
+      <ResourceForm reload={reload} />
       {cards}
-      <button className="shadow-md m-2 p-2 border" onClick={async () => {
-        await axios.post(`${url}/${params.id}/resource`);
-      }}>DEBUG ONLY: post resource</button>
     </div>
   );
 }

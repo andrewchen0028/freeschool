@@ -36,14 +36,14 @@ app.get("/:nodeId", function getNodeWindow(request, response) {
   });
 });
 
-// DEBUG ONLY
-// TODO: implement error handling for duplicate resources within the same node
-app.post("/:nodeId/resource", function postResource(request, response) {
+app.post("/:nodeId/resources", function postResource(request, response) {
   Resource.create({
-    resourceId: "Resource-E",
+    resourceId: request.body.resourceId,
     nodeId: request.params.nodeId
   }).then(() => {
     return response.status(200).end();
+  }).catch(() => {
+    return response.status(400).end();
   });
 });
 
