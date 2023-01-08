@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 @layer components {
-  .card { @apply border m-2 p-2 shadow-sm rounded-sm }
+  .card { @apply m-2 p-2 border shadow rounded }
   .button { @apply card bg-white hover:bg-neutral-100 active:bg-neutral-200 }
 }

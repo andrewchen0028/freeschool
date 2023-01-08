@@ -37,7 +37,7 @@ function ResourceForm({ reload }) {
       {duplicateFlag && <h2>Resource name taken</h2>}
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Title" value={resourceId}
-          onChange={handleChange} />
+          required="required" onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
     </div>
@@ -51,7 +51,7 @@ export default function ResourceList() {
   const params = useParams();
 
   const reload = useCallback(() => {
-    axios.get(`${url}/${params.nodeId}`).then((response) => {
+    axios.get(`${url}/${params.nodeId}/resources`).then((response) => {
       setCards(response.data.map((resource) => {
         return <ResourceCard resource={resource} key={resource.resourceId} />;
       }));

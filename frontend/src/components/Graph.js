@@ -41,6 +41,9 @@ export default function Graph() {
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
+  // 
+  // TODO-low: implement interactive grid background
+  //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
     function paintRing(node, color, ctx, radius) {
       ctx.beginPath();

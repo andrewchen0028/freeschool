@@ -6,6 +6,10 @@ const Node = sequelize.define("node", {
     type: DataTypes.STRING,
     primaryKey: true,
   },
+  score: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  }
 });
 
 module.exports = Node;
