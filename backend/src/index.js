@@ -48,7 +48,7 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
 });
 
 // Called upon receiving a node vote.
-app.post("/:nodeId/:vote", function postNodeVote(request, response) {
+app.post("/:nodeId/vote/:vote", function postNodeVote(request, response) {
   switch (request.params.vote) {
     case "upvote":
       Node.increment("score", { where: { nodeId: request.params.nodeId } })
@@ -65,7 +65,7 @@ app.post("/:nodeId/:vote", function postNodeVote(request, response) {
 });
 
 // Called upon posting a resource.
-app.post("/:nodeId/resources", function postResource(request, response) {
+app.post("/:nodeId/resource", function postResource(request, response) {
   Resource.create({
     resourceId: request.body.resourceId,
     nodeId: request.params.nodeId

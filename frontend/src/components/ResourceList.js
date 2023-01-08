@@ -24,12 +24,15 @@ function ResourceForm({ reload }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    axios.post(`${url}/${params.nodeId}/resources`, {
+    axios.post(`${url}/${params.nodeId}/resource`, {
       resourceId: resourceId.replace(" ", "-")
     }).then(() => {
       setResourceId("");
       reload();
-    }).catch(() => { setDuplicateFlag(true); });
+    }).catch(() => {
+      setResourceId("");
+      setDuplicateFlag(true);
+    });
   }
 
   return (

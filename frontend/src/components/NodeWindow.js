@@ -1,16 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import url from "..";
-
-import ResourceList from "./ResourceList";
 
 function NodeWindowHeader() {
   const params = useParams();
   const [nodeMetadata, setNodeMetadata] = useState();
 
   function vote(type) {
-    axios.post(`${url}/${params.nodeId}/${type}`).then(reload);
+    axios.post(`${url}/${params.nodeId}/vote/${type}`).then(reload);
   }
 
   function reload() {
@@ -37,22 +35,25 @@ function NodeWindowHeader() {
   );
 }
 
-function NodeWindowSideBar() {
-  const navigate = useNavigate();
-
+function NodeWindowSideBar({ navigate }) {
   return (<div className="bg-neutral-800 flex-grow"
     onClick={() => { navigate(`/`); }} />);
 }
 
 export default function NodeWindow() {
+  const navigate = useNavigate();
+  const params = useParams();
+
+  useEffect(() => { navigate(`resources`); }, [navigate, params.nodeId]);
+
   return (
     <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
-      <NodeWindowSideBar />
+      <NodeWindowSideBar navigate={navigate} />
       <div className="w-3/5 bg-white overflow-y-scroll">
         <NodeWindowHeader />
-        <ResourceList />
+        <Outlet />
       </div>
-      <NodeWindowSideBar />
+      <NodeWindowSideBar navigate={navigate} />
 
     </div>
   );
