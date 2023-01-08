@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer components {
-  .card { @apply m-2 p-2 border shadow rounded }
-  .button { @apply card bg-white hover:bg-neutral-100 active:bg-neutral-200 }
+  .card { @apply m-2 border rounded }
+  .button { @apply card p-2 bg-white hover:bg-neutral-100 active:bg-neutral-200 }
+  .vote { @apply font-mono font-extrabold px-2
+    text-neutral-600 hover:bg-neutral-100 active:bg-neutral-200
+  }
+  .upvote { @apply vote hover:text-orange-600 active:text-orange-600 }
+  .downvote { @apply vote hover:text-indigo-400 active:text-indigo-400 }
 }

@@ -9,16 +9,30 @@ function NodeWindowHeader() {
   const params = useParams();
   const [nodeMetadata, setNodeMetadata] = useState();
 
-  useEffect(() => {
+  function vote(type) {
+    axios.post(`${url}/${params.nodeId}/${type}`).then(reload);
+  }
+
+  function reload() {
     axios.get(`${url}/${params.nodeId}`).then((response) => {
       setNodeMetadata(response.data);
     });
-  }, [params.nodeId]);
+  }
+
+  useEffect(reload, [params.nodeId]);
 
   return (!nodeMetadata ? <div /> :
-    <div className="card flex items-center gap-2 text-xl">
-      <h1>{nodeMetadata.score}</h1 >
-      <h1 className="p-2">{nodeMetadata.nodeId.replace("-", " ")}</h1>
+    <div className="flex items-center gap-2 text-xl">
+      {/* VOTE BUTTONS */}
+      <div className="p-2 flex flex-col items-center">
+        <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
+        <h1 className="font-semibold">{nodeMetadata.score}</h1 >
+        <button className="downvote" onClick={() => { vote("downvote") }}>—</button>
+      </div>
+
+      {/* TITLE */}
+      <h1>{nodeMetadata.nodeId.replace("-", " ")}</h1>
+
     </div >
   );
 }
