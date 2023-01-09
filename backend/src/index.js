@@ -11,6 +11,7 @@ app.use(cors());
 // Called upon opening the graph from the homepage. Will eventually need to
 // filter item visibility by score somehow - maybe this should be done by
 // the client to avoid round-trip delay when using the score filter slider?
+// (Also to avoid increasing server load with number of clients)
 app.get("/", function getGraph(_, response) {
   Promise.all([
     Node.findAll().then((nodes) => {
@@ -37,13 +38,21 @@ app.get("/:nodeId", function getNodeWindow(request, response) {
   });
 });
 
-// Called upon selecting Resources within a NodeWindow. Returns a list
-// of resources for the given node.
+// Called upon selecting Resources within a NodeWindow.
 app.get("/:nodeId/resources", function getNodeResources(request, response) {
   Resource.findAll({
     where: { nodeId: request.params.nodeId }
   }).then((resources) => {
     return response.json(resources).status(200).end();
+  });
+});
+
+// Called upon selecting Inlinks within a NodeWindow.
+app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
+  Link.findAll({
+    where: { targetNodeId: request.params.nodeId }
+  }).then((inlinks) => {
+    return response.json(inlinks).status(200).end();
   });
 });
 

@@ -39,7 +39,7 @@ function ResourceForm({ reload }) {
     <div>
       {duplicateFlag && <h2>Resource name taken</h2>}
       <form onSubmit={handleSubmit}>
-        <input className="card p-2" placeholder="Title" value={resourceId}
+        <input className="card" placeholder="Title" value={resourceId}
           required="required" onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
