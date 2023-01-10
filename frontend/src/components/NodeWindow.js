@@ -87,6 +87,8 @@ export default function NodeWindow() {
       <div className="w-3/5 bg-white overflow-y-scroll">
         <NodeWindowHeader />
         <ItemListSelectors />
+        
+        {/* TODO-medium: all "ItemList" variants can maybe be merged */}
         <Outlet />
       </div>
       <NodeWindowSideBar />

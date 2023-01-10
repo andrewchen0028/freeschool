@@ -7,6 +7,7 @@ import InlinkList from './components/InlinkList';
 import ResourceList from './components/ResourceList';
 
 import "./index.css";
+import OutlinkList from './components/OutlinkList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,7 +17,7 @@ root.render(
         <Route path=":nodeId" element={<NodeWindow />}>
           <Route path="resources" element={<ResourceList />} />
           <Route path="inlinks" element={<InlinkList />} />
-          <Route path="outlinks" element={<h1>Bye</h1>} />
+          <Route path="outlinks" element={<OutlinkList />} />
         </Route>
       </Route>
     </Routes>

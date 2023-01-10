@@ -3,32 +3,32 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import url from "..";
 
-function InlinkCard({ inlink }) {
+function OutlinkCard({ outlink }) {
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.sourceNodeId}`}>
-        {inlink.sourceNodeId.replace("-", " ")}</Link>
+      to <Link to={`../../${outlink.targetNodeId}`}>
+        {outlink.targetNodeId.replace("-", " ")}</Link>
     </div>
   )
 }
 
-function InlinkForm({ reload }) {
-  const [sourceNodeId, setSourceNodeId] = useState("");
+function OutlinkForm({ reload }) {
+  const [targetNodeId, setTargetNodeId] = useState("");
   const [errorFlag, setErrorFlag] = useState();
   const params = useParams();
 
   function handleChange(event) {
-    setSourceNodeId(event.target.value);
+    setTargetNodeId(event.target.value);
     setErrorFlag();
   }
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    axios.post(`${url}/${params.nodeId}/inlink`, {
-      sourceNodeId: sourceNodeId.replace(" ", "-")
+    axios.post(`${url}/${params.nodeId}/outlink`, {
+      targetNodeId: targetNodeId.replace(" ", "-")
     }).then(() => {
-      setSourceNodeId("");
+      setTargetNodeId("");
       reload();
     }).catch((error) => {
       setErrorFlag(error.response.status);
@@ -38,27 +38,27 @@ function InlinkForm({ reload }) {
   return (
     <div>
       {errorFlag === 400 &&
-        <h2>{`Inlink from "${sourceNodeId}" already exists`}</h2>}
+        <h2>{`Outlink to "${targetNodeId}" already exists`}</h2>}
       {errorFlag === 404 &&
-        <h2>{`Source node "${sourceNodeId}" not found`}</h2>}
+        <h2>{`Target node "${targetNodeId}" not found`}</h2>}
       <form onSubmit={handleSubmit}>
-        <input id="inlinkForm" className="card" placeholder="Source Node"
-          value={sourceNodeId} required="required" onChange={handleChange} />
+        <input id="outlinkForm" className="card" placeholder="Target Node"
+          value={targetNodeId} required="required" onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
     </div>
   )
 }
 
-export default function InlinkList() {
+export default function OutlinkList() {
   const [cards, setCards] = useState([]);
   const params = useParams();
 
   const reload = useCallback(() => {
-    axios.get(`${url}/${params.nodeId}/inlinks`).then((response) => {
+    axios.get(`${url}/${params.nodeId}/outlinks`).then((response) => {
       setCards(response.data.length > 0
-        ? response.data.map((inlink) => (
-          <InlinkCard inlink={inlink} key={inlink.sourceNodeId} />
+        ? response.data.map((outlink) => (
+          <OutlinkCard outlink={outlink} key={outlink.targetNodeId} />
         ))
         : <h1 className="card">None</h1>);
     });
@@ -68,7 +68,7 @@ export default function InlinkList() {
 
   return (
     <div>
-      <InlinkForm reload={reload} />
+      <OutlinkForm reload={reload} />
       {cards}
     </div>
   );

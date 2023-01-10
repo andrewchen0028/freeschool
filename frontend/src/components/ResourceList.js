@@ -55,9 +55,11 @@ export default function ResourceList() {
 
   const reload = useCallback(() => {
     axios.get(`${url}/${params.nodeId}/resources`).then((response) => {
-      setCards(response.data.map((resource) => {
-        return <ResourceCard resource={resource} key={resource.resourceId} />;
-      }));
+      setCards(response.data.length > 0
+        ? response.data.map((resource) => (
+          <ResourceCard resource={resource} key={resource.resourceId} />
+        ))
+        : <h1 className="card">None</h1>);
     });
   }, [params.nodeId]);
 

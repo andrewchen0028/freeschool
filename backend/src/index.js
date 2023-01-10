@@ -56,6 +56,16 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
   });
 });
 
+// Called upon selecting Outlinks within a NodeWindow.
+// TODO: merge GET endpoints for inlinks/outlinks
+app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
+  Link.findAll({
+    where: { sourceNodeId: request.params.nodeId }
+  }).then((outlinks) => {
+    return response.json(outlinks).status(200).end();
+  });
+});
+
 // Called upon posting a node vote.
 app.post("/:nodeId/vote/:vote", function postNodeVote(request, response) {
   switch (request.params.vote) {
@@ -96,18 +106,42 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
   }).catch((error) => {
     switch (error.parent.code) {
       case "23503":
-        console.warn(`Attempted to add link with non-existent source
+        console.warn(`Attempted to add inlink with non-existent source
           ${request.body.sourceNodeId}`);
         return response.status(404).end();
       case "23505":
-        console.warn("Attempted to add link that already exists");
+        console.warn("Attempted to add inlink that already exists");
         return response.status(400).end();
       default:
         console.log(`Failed to add link\n${error}`);
         break;
     }
   });
-})
+});
+
+// Called upon posting an outlink.
+// TODO: merge POST endpoints for inlinks/outlinks
+app.post("/:nodeId/outlink", function outInlink(request, response) {
+  Link.create({
+    sourceNodeId: request.params.nodeId,
+    targetNodeId: request.body.targetNodeId,
+  }).then(() => {
+    return response.status(200).end();
+  }).catch((error) => {
+    switch (error.parent.code) {
+      case "23503":
+        console.warn(`Attempted to add outlink with non-existent target
+          ${request.body.sourceNodeId}`);
+        return response.status(404).end();
+      case "23505":
+        console.warn("Attempted to add outlink that already exists");
+        return response.status(400).end();
+      default:
+        console.log(`Failed to add link\n${error}`);
+        break;
+    }
+  });
+});
 
 // DEBUG ONLY
 app.delete("/", async function resetDatabase(_, response) {
