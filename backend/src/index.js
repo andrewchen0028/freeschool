@@ -56,7 +56,7 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
   });
 });
 
-// Called upon receiving a node vote.
+// Called upon posting a node vote.
 app.post("/:nodeId/vote/:vote", function postNodeVote(request, response) {
   switch (request.params.vote) {
     case "upvote":
@@ -81,9 +81,33 @@ app.post("/:nodeId/resource", function postResource(request, response) {
   }).then(() => {
     return response.status(200).end();
   }).catch(() => {
+    // TODO-medium: add proper error handling (switch statement)
     return response.status(400).end();
   });
 });
+
+// Called upon posting an inlink.
+app.post("/:nodeId/inlink", function postInlink(request, response) {
+  Link.create({
+    sourceNodeId: request.body.sourceNodeId,
+    targetNodeId: request.params.nodeId,
+  }).then(() => {
+    return response.status(200).end();
+  }).catch((error) => {
+    switch (error.parent.code) {
+      case "23503":
+        console.warn(`Attempted to add link with non-existent source
+          ${request.body.sourceNodeId}`);
+        return response.status(404).end();
+      case "23505":
+        console.warn("Attempted to add link that already exists");
+        return response.status(400).end();
+      default:
+        console.log(`Failed to add link\n${error}`);
+        break;
+    }
+  });
+})
 
 // DEBUG ONLY
 app.delete("/", async function resetDatabase(_, response) {

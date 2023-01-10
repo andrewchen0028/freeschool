@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Graph from './components/Graph';
-import InlinkList from './components/InlinkList';
 import NodeWindow from './components/NodeWindow';
+import InlinkList from './components/InlinkList';
 import ResourceList from './components/ResourceList';
 
 import "./index.css";

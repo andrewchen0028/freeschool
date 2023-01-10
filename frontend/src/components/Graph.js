@@ -75,7 +75,7 @@ export default function Graph() {
         node.__bckgRadius = ringRadius;
       })
       .onNodeHover((node) => { setHover(node); })
-      .onNodeClick((node) => { navigate(`${node.id.replace(" ", "-")}`); });
+      .onNodeClick((node) => { navigate(`${node.id}`); });
   }, [graphRef, hover, navigate]);
 
   useEffect(function redrawGraph() {

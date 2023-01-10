@@ -44,13 +44,15 @@ function NodeWindowHeader() {
 }
 
 
+// Note that <ItemListSelectors /> doesn't currently know about "params.nodeId"
+// like <NodeWindowHeader /> does. Therefore, <ItemListSelectors /> won't reset
+// to "resources" upon jumping to another node through "inlinks/outlinks".
 function ItemListSelectors() {
   const [itemType, setItemType] = useState("resources");
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate(itemType);
-  }, [itemType, navigate]);
+  useEffect(() => { navigate(itemType); }, [itemType, navigate]);
 
   return (
     <div className="card flex gap-2">

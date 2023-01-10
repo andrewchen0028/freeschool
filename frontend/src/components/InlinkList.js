@@ -3,14 +3,49 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import url from "..";
 
-// TODO-current: make Link default to "resources" upon opening source node
-//    * probably requires some cleaning up / rewriting of state in
-//      NodeWindow and its child components
 function InlinkCard({ inlink }) {
   return (
     <div className="card z-10">
       from <Link to={`../../${inlink.sourceNodeId}`}>
         {inlink.sourceNodeId.replace("-", " ")}</Link>
+    </div>
+  )
+}
+
+function InlinkForm({ reload }) {
+  const [sourceNodeId, setSourceNodeId] = useState("");
+  const [errorFlag, setErrorFlag] = useState();
+  const params = useParams();
+
+  function handleChange(event) {
+    setSourceNodeId(event.target.value);
+    setErrorFlag();
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    axios.post(`${url}/${params.nodeId}/inlink`, {
+      sourceNodeId: sourceNodeId.replace(" ", "-")
+    }).then(() => {
+      setSourceNodeId("");
+      reload();
+    }).catch((error) => {
+      setErrorFlag(error.response.status);
+    });
+  }
+
+  return (
+    <div>
+      {errorFlag === 400 && <h2>
+        {`Inlink from "${sourceNodeId}" already exists`}</h2>}
+      {errorFlag === 404 &&
+        <h2>{`Source node "${sourceNodeId}" not found`}</h2>}
+      <form onSubmit={handleSubmit}>
+        <input id="inlinkForm" className="card" placeholder="Source Node"
+          value={sourceNodeId} required="required" onChange={handleChange} />
+        <button className="button" type="submit">Submit</button>
+      </form>
     </div>
   )
 }
@@ -33,7 +68,7 @@ export default function InlinkList() {
 
   return (
     <div>
-      {/* <InlinkForm reload={reload} /> */}
+      <InlinkForm reload={reload} />
       {cards}
     </div>
   );
