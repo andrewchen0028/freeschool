@@ -36,11 +36,11 @@ function OutlinkForm({ reload }) {
   }
 
   return (
-    <div>
-      {errorFlag === 400 &&
-        <h2>{`Outlink to "${targetNodeId}" already exists`}</h2>}
-      {errorFlag === 404 &&
-        <h2>{`Target node "${targetNodeId}" not found`}</h2>}
+    <div className="card">
+      {errorFlag === 400 && <p className="text-red-500">
+        {`Outlink to "${targetNodeId}" already exists`}</p>}
+      {errorFlag === 404 && <p className="text-red-500">
+        {`Target node "${targetNodeId}" not found`}</p>}
       <form onSubmit={handleSubmit}>
         <input id="outlinkForm" className="card" placeholder="Target Node"
           value={targetNodeId} required="required" onChange={handleChange} />

@@ -4,10 +4,10 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Graph from './components/Graph';
 import NodeWindow from './components/NodeWindow';
 import InlinkList from './components/InlinkList';
+import OutlinkList from './components/OutlinkList';
 import ResourceList from './components/ResourceList';
 
 import "./index.css";
-import OutlinkList from './components/OutlinkList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -79,7 +79,7 @@ function ItemListSelectors() {
 }
 
 
-// TODO-current: implement itemlist selectors and in/outlink lists
+// TODO-medium: merge "ItemList" variants
 export default function NodeWindow() {
   return (
     <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
@@ -87,8 +87,6 @@ export default function NodeWindow() {
       <div className="w-3/5 bg-white overflow-y-scroll">
         <NodeWindowHeader />
         <ItemListSelectors />
-        
-        {/* TODO-medium: all "ItemList" variants can maybe be merged */}
         <Outlet />
       </div>
       <NodeWindowSideBar />

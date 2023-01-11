@@ -36,11 +36,11 @@ function InlinkForm({ reload }) {
   }
 
   return (
-    <div>
-      {errorFlag === 400 &&
-        <h2>{`Inlink from "${sourceNodeId}" already exists`}</h2>}
-      {errorFlag === 404 &&
-        <h2>{`Source node "${sourceNodeId}" not found`}</h2>}
+    <div className="card">
+      {errorFlag === 400 && <p className="text-red-500">
+        {`Inlink from "${sourceNodeId}" already exists`}</p>}
+      {errorFlag === 404 && <p className="text-red-500">
+        {`Source node "${sourceNodeId}" not found`}</p>}
       <form onSubmit={handleSubmit}>
         <input id="inlinkForm" className="card" placeholder="Source Node"
           value={sourceNodeId} required="required" onChange={handleChange} />
