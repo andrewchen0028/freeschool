@@ -6,7 +6,8 @@ import url from "..";
 function OutlinkCard({ outlink }) {
   return (
     <div className="card z-10">
-      to <Link to={`../../${outlink.targetNodeId}`}>
+      to <Link to={`../../${outlink.targetNodeId}`}
+        className="text-blue-600 underline">
         {outlink.targetNodeId.replace("-", " ")}</Link>
     </div>
   )
@@ -36,6 +37,8 @@ function OutlinkForm({ reload }) {
   }
 
   return (
+    // TODO-low: replace hacky <p> error labels with proper labels
+    // (Also relevant for other ItemLists)
     <div className="card">
       {errorFlag === 400 && <p className="text-red-500">
         {`Outlink to "${targetNodeId}" already exists`}</p>}

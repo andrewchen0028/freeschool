@@ -56,6 +56,7 @@ function ItemListSelectors() {
 
   return (
     <div className="card flex gap-2">
+      {/* TODO-low: implement sorted ItemLists */}
       <div>
         <label htmlFor="sortmode">Sort: </label>
         <select name="sortmode" id="sortmode">

@@ -6,7 +6,8 @@ import url from "..";
 function InlinkCard({ inlink }) {
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.sourceNodeId}`}>
+      from <Link to={`../../${inlink.sourceNodeId}`}
+        className="text-blue-600 underline">
         {inlink.sourceNodeId.replace("-", " ")}</Link>
     </div>
   )

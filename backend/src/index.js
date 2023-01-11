@@ -161,10 +161,22 @@ app.delete("/", async function resetDatabase(_, response) {
   });
 
   await Resource.bulkCreate([
-    { resourceId: "Resource-A", nodeId: "Calculus-1" },
-    { resourceId: "Resource-B", nodeId: "Calculus-1" },
-    { resourceId: "Resource-C", nodeId: "Calculus-2" },
-    { resourceId: "Resource-D", nodeId: "Calculus-2" },
+    {
+      resourceId: "freeCodeCamp Calc 1 https://youtu.be/HfACrKJ_Y2w",
+      nodeId: "Calculus-1"
+    },
+    {
+      resourceId: "Prof. Leonard https://youtube.com/playlist?list=PLF797E961509B4EB5",
+      nodeId: "Calculus-1"
+    },
+    {
+      resourceId: "freeCodeCamp Calc 2 https://youtu.be/7gigNsz4Oe8",
+      nodeId: "Calculus-2"
+    },
+    {
+      resourceId: "other video [imagine URL here]",
+      nodeId: "Calculus-2"
+    },
   ]);
 
   return response.status(200).end();
