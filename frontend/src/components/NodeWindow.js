@@ -32,12 +32,12 @@ function NodeWindowHeader() {
       {/* VOTE BUTTONS */}
       <div className="p-2 flex flex-col items-center">
         <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
-        <h1 className="font-semibold">{nodeMetadata.score}</h1 >
+        <h2>{nodeMetadata.score}</h2>
         <button className="downvote" onClick={() => { vote("downvote") }}>—</button>
       </div>
 
       {/* TITLE */}
-      <h1>{nodeMetadata.nodeId.replace("-", " ")}</h1>
+      <h2>{nodeMetadata.nodeId.replace("-", " ")}</h2>
 
     </div >
   );

@@ -7,7 +7,8 @@ import url from "..";
 function ResourceCard({ resource }) {
   return (
     <div className="card z-10">
-      {resource.url.replace("-", " ")}
+      <a target="_blank" rel="noopener noreferrer" href={resource.url}
+        className="text-blue-600 underline">{resource.url}</a>
     </div>
   );
 }
@@ -37,6 +38,7 @@ function ResourceForm({ reload }) {
 
   return (
     <div className="card">
+      <h4>Add resource</h4>
       {errorFlag === 400 && <p className="text-red-500">
         Resource already exists</p>}
       {errorFlag === 404 && <p className="text-red-500">
@@ -62,7 +64,7 @@ export default function ResourceList() {
         ? response.data.map((resource) => (
           <ResourceCard resource={resource} key={resource.id} />
         ))
-        : <h1 className="card">None</h1>);
+        : <p className="card">None</p>);
     });
   }, [params.nodeId]);
 

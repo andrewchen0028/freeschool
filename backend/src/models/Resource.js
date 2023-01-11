@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 
-// TODO-current: add score
+// TODO-medium: add score
 const Resource = sequelize.define("resource", {
   nodeId: {
     type: DataTypes.STRING,

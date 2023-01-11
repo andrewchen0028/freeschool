@@ -61,7 +61,7 @@ export default function InlinkList() {
         ? response.data.map((inlink) => (
           <InlinkCard inlink={inlink} key={inlink.sourceNodeId} />
         ))
-        : <h1 className="card">None</h1>);
+        : <p className="card">None</p>);
     });
   }, [params.nodeId]);
 

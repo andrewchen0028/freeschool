@@ -63,7 +63,7 @@ export default function OutlinkList() {
         ? response.data.map((outlink) => (
           <OutlinkCard outlink={outlink} key={outlink.targetNodeId} />
         ))
-        : <h1 className="card">None</h1>);
+        : <p className="card">None</p>);
     });
   }, [params.nodeId]);
 
