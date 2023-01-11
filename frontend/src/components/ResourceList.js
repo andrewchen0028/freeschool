@@ -7,39 +7,42 @@ import url from "..";
 function ResourceCard({ resource }) {
   return (
     <div className="card z-10">
-      {resource.resourceId.replace("-", " ")}
+      {resource.url.replace("-", " ")}
     </div>
   );
 }
 
 function ResourceForm({ reload }) {
-  const [resourceId, setResourceId] = useState("");
-  const [duplicateFlag, setDuplicateFlag] = useState(false);
+  const [resourceUrl, setResourceUrl] = useState("");
+  const [errorFlag, setErrorFlag] = useState();
   const params = useParams();
 
   function handleChange(event) {
-    setResourceId(event.target.value);
-    setDuplicateFlag(false);
+    setResourceUrl(event.target.value);
+    setErrorFlag();
   }
 
   function handleSubmit(event) {
     event.preventDefault();
+
     axios.post(`${url}/${params.nodeId}/resource`, {
-      resourceId: resourceId.replace(" ", "-")
+      url: resourceUrl.replace(" ", "-")
     }).then(() => {
-      setResourceId("");
+      setResourceUrl("");
       reload();
-    }).catch(() => {
-      setResourceId("");
-      setDuplicateFlag(true);
+    }).catch((error) => {
+      setErrorFlag(error.response.status);
     });
   }
 
   return (
     <div className="card">
-      {duplicateFlag && <p className="text-red-500">Resource name taken</p>}
+      {errorFlag === 400 && <p className="text-red-500">
+        Resource already exists</p>}
+      {errorFlag === 404 && <p className="text-red-500">
+        Node no longer exists, try reloading the page</p>}
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Title" value={resourceId}
+        <input type={"url"} className="card" placeholder="Title" value={resourceUrl}
           required="required" onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
@@ -57,7 +60,7 @@ export default function ResourceList() {
     axios.get(`${url}/${params.nodeId}/resources`).then((response) => {
       setCards(response.data.length > 0
         ? response.data.map((resource) => (
-          <ResourceCard resource={resource} key={resource.resourceId} />
+          <ResourceCard resource={resource} key={resource.id} />
         ))
         : <h1 className="card">None</h1>);
     });

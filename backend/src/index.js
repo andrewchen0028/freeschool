@@ -86,13 +86,23 @@ app.post("/:nodeId/vote/:vote", function postNodeVote(request, response) {
 // Called upon posting a resource.
 app.post("/:nodeId/resource", function postResource(request, response) {
   Resource.create({
-    resourceId: request.body.resourceId,
+    url: request.body.url,
     nodeId: request.params.nodeId
   }).then(() => {
     return response.status(200).end();
-  }).catch(() => {
-    // TODO-medium: add proper error handling (switch statement)
-    return response.status(400).end();
+  }).catch((error) => {
+    switch (error.parent.code) {
+      case "23503":
+        console.warn(`Attempted to add resource on non-existent node
+          ${request.params.nodeId}`);
+        return response.status(404).end();
+      case "23505":
+        console.warn(`Attempted to add duplicate resource`);
+        return response.status(400).end();
+      default:
+        console.warn(`Failed to add resource\n${error}`);
+        break;
+    }
   });
 });
 
@@ -110,10 +120,10 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
           ${request.body.sourceNodeId}`);
         return response.status(404).end();
       case "23505":
-        console.warn("Attempted to add inlink that already exists");
+        console.warn(`Attempted to add duplicate inlink`);
         return response.status(400).end();
       default:
-        console.log(`Failed to add link\n${error}`);
+        console.warn(`Failed to add link\n${error}`);
         break;
     }
   });
@@ -134,7 +144,7 @@ app.post("/:nodeId/outlink", function outInlink(request, response) {
           ${request.body.sourceNodeId}`);
         return response.status(404).end();
       case "23505":
-        console.warn("Attempted to add outlink that already exists");
+        console.warn(`Attempted to add duplicate outlink`);
         return response.status(400).end();
       default:
         console.log(`Failed to add link\n${error}`);
@@ -161,29 +171,17 @@ app.delete("/", async function resetDatabase(_, response) {
   });
 
   await Resource.bulkCreate([
-    {
-      resourceId: "freeCodeCamp Calc 1 https://youtu.be/HfACrKJ_Y2w",
-      nodeId: "Calculus-1"
-    },
-    {
-      resourceId: "Prof. Leonard https://youtube.com/playlist?list=PLF797E961509B4EB5",
-      nodeId: "Calculus-1"
-    },
-    {
-      resourceId: "freeCodeCamp Calc 2 https://youtu.be/7gigNsz4Oe8",
-      nodeId: "Calculus-2"
-    },
-    {
-      resourceId: "other video [imagine URL here]",
-      nodeId: "Calculus-2"
-    },
+    { nodeId: "Calculus-1", url: "https://www.fbi.gov" },
+    { nodeId: "Calculus-1", url: "https://www.atf.gov" },
+    { nodeId: "Calculus-2", url: "https://www.nsa.gov" },
+    { nodeId: "Calculus-2", url: "https://www.cia.gov" },
   ]);
 
   return response.status(200).end();
-
-});
+}
+);
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

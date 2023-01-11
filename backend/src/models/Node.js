@@ -9,7 +9,7 @@ const Node = sequelize.define("node", {
   score: {
     type: DataTypes.INTEGER,
     defaultValue: 0
-  }
+  },
 });
 
 module.exports = Node;
