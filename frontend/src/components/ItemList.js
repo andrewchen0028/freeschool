@@ -5,6 +5,9 @@ import url from "..";
 import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 
+// Use ItemList by defining a <Form /> and a <Card /> component, then setting
+// the URL extension "ext" and exporting a new <ItemList /> variant.
+
 // form: <ResourceForm />, <InlinkForm />, etc
 // card: <ResourceCard />, <InlinkCard />, etc
 // ext: "resources", "inlinks", etc

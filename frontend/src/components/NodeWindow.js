@@ -80,7 +80,6 @@ function ItemListSelectors() {
 }
 
 
-// TODO-medium: merge "ItemList" variants
 export default function NodeWindow() {
   return (
     <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">

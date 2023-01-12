@@ -28,7 +28,6 @@ export function InlinkForm({ reload }) {
 
   return (
     <div className="card">
-      {/* TODO: implement error messages */}
       {errorFlag === 409 && <p className="text-red-500">
         {`Inlink from "${stagedSourceNodeId}" already exists`}</p>}
       {errorFlag === 404 && <p className="text-red-500">

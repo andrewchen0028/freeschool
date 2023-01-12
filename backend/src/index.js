@@ -62,7 +62,7 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
 });
 
 // Called upon selecting Outlinks within a NodeWindow.
-// TODO: merge GET endpoints for inlinks/outlinks
+// TODO-low: merge GET endpoints for inlinks/outlinks
 app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
   Link.findAll({
     where: { sourceNodeId: request.params.nodeId }
@@ -141,7 +141,7 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
 });
 
 // Called upon posting an outlink.
-// TODO: merge POST endpoints for inlinks/outlinks
+// TODO-low: merge POST endpoints for inlinks/outlinks
 app.post("/:nodeId/outlink", function outInlink(request, response) {
   Link.create({
     sourceNodeId: request.params.nodeId,
