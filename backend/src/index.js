@@ -8,6 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// TODO-medium: Update Seuqelize error handlers to use "error.name"
+//              instead of "error.parent.code", which apparently
+//              doesn't exist on all errors. Also add error messages
+//              (console.warn).
+
 // Called upon opening the graph from the homepage. Will eventually need to
 // filter item visibility by score somehow - maybe this should be done by
 // the client to avoid round-trip delay when using the score filter slider?
@@ -91,17 +96,23 @@ app.post("/:nodeId/resource", function postResource(request, response) {
   }).then(() => {
     return response.status(200).end();
   }).catch((error) => {
-    switch (error.parent.code) {
-      case "23503":
-        console.warn(`Attempted to add resource on non-existent node
+    switch (error.name) {
+      case "SequelizeValidationError":
+        console.warn(`Attempted to add resource with invalid URL:
+          ${request.body.url}`);
+        return response.status(400).end();
+      case "SequelizeForeignKeyConstraintError":
+        console.warn(`Attempted to add resource on non-existent node:
           ${request.params.nodeId}`);
         return response.status(404).end();
-      case "23505":
-        console.warn(`Attempted to add duplicate resource`);
-        return response.status(400).end();
+      case "SequelizeUniqueConstraintError":
+        console.warn(`Attempted to add duplicate resource:
+          ${request.body.url}`);
+        return response.status(409).end();
       default:
-        console.warn(`Failed to add resource\n${error}`);
-        break;
+        console.warn(`Failed to add resource ${request.body.url}:
+          \n${error}`);
+        return response.status(500).end();
     }
   });
 });
@@ -121,7 +132,7 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
         return response.status(404).end();
       case "23505":
         console.warn(`Attempted to add duplicate inlink`);
-        return response.status(400).end();
+        return response.status(409).end();
       default:
         console.warn(`Failed to add link\n${error}`);
         break;
@@ -145,9 +156,9 @@ app.post("/:nodeId/outlink", function outInlink(request, response) {
         return response.status(404).end();
       case "23505":
         console.warn(`Attempted to add duplicate outlink`);
-        return response.status(400).end();
+        return response.status(409).end();
       default:
-        console.log(`Failed to add link\n${error}`);
+        console.warn(`Failed to add link\n${error}`);
         break;
     }
   });
