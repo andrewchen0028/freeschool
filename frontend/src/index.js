@@ -7,12 +7,14 @@ import NodeWindow from './components/NodeWindow';
 import { InlinkList, OutlinkList, ResourceList } from './components/ItemList';
 
 import "./index.css";
+import NodeForm from './components/NodeForm';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Graph />}>
+        <Route path="createNode" element={<NodeForm />} />
         <Route path=":nodeId" element={<NodeWindow />}>
           <Route path="resources" element={<ResourceList />} />
           <Route path="inlinks" element={<InlinkList />} />

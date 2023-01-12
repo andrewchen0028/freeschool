@@ -71,6 +71,19 @@ app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
   });
 });
 
+// Called upon posting a node.
+app.post("/node", function postNode(request, response) {
+  Node.create({
+    nodeId: request.body.nodeId
+  }).then(() => {
+    return response.status(200).end();
+  }).catch((error) => {
+    // TODO-low: add error handling (e.g. duplicate node)
+    console.warn(`Failed to add node ${request.body.nodeId}:\n${error}`);
+    return response.status(500).end();
+  });
+});
+
 // Called upon posting a node vote.
 app.post("/:nodeId/vote/:vote", function postNodeVote(request, response) {
   switch (request.params.vote) {

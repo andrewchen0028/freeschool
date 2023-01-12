@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import url from "..";
 
-export function InlinkForm({ reload }) {
+export function InlinkForm({ reload, addLink }) {
   const [stagedSourceNodeId, stageSourceNodeId] = useState("");
   const [errorFlag, setErrorFlag] = useState();
   const { nodeId } = useParams();
@@ -19,6 +19,10 @@ export function InlinkForm({ reload }) {
     axios.post(`${url}/${nodeId}/inlink`, {
       sourceNodeId: stagedSourceNodeId.replace(" ", "-")
     }).then(() => {
+      addLink({
+        source: stagedSourceNodeId.replace(" ", "-"),
+        target: nodeId.replace(" ", "-")
+      });
       stageSourceNodeId("");
       reload();
     }).catch((error) => {
@@ -41,7 +45,7 @@ export function InlinkForm({ reload }) {
   );
 }
 
-export function OutlinkForm({ reload }) {
+export function OutlinkForm({ reload, addLink }) {
   const [stagedTargetNodeId, stageTargetNodeId] = useState("");
   const [errorFlag, setErrorFlag] = useState();
   const { nodeId } = useParams();
@@ -57,6 +61,10 @@ export function OutlinkForm({ reload }) {
     axios.post(`${url}/${nodeId}/outlink`, {
       targetNodeId: stagedTargetNodeId.replace(" ", "-")
     }).then(() => {
+      addLink({
+        source: nodeId.replace(" ", "-"),
+        target: stagedTargetNodeId.replace(" ", "-")
+      });
       stageTargetNodeId("");
       reload();
     }).catch((error) => {

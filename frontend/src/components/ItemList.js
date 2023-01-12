@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import url from "..";
 import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
@@ -13,7 +13,9 @@ import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 // ext: "resources", "inlinks", etc
 function ItemList({ Form, Card, ext }) {
   const [cards, setCards] = useState([]);
+
   const { nodeId } = useParams();
+  const [addLink] = useOutletContext();
 
   const reload = useCallback(() => {
     axios.get(`${url}/${nodeId}/${ext}`).then((response) => {
@@ -25,7 +27,7 @@ function ItemList({ Form, Card, ext }) {
         // only used as a temporary solution here.
         // 
         // TODO-high: Give each DB model an "id" field. Then, replace "index"
-        // with "item.id".
+        // with "item.id".`
         ? response.data.map((item, index) => {
           return (<Card item={item} key={index} />);
         }) : <div className="card">None</div>);
@@ -36,7 +38,7 @@ function ItemList({ Form, Card, ext }) {
 
   return (
     <div>
-      {<Form reload={reload} />}
+      {<Form reload={reload} addLink={addLink} />}
       {cards}
     </div>
   );

@@ -10,7 +10,9 @@ import { ForceGraphInstance } from "force-graph";
 import url from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
+import BottomBar from "./BottomBar";
 
+// TODO-low: make graph react to window size changes.
 export default function Graph() {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
@@ -30,6 +32,9 @@ export default function Graph() {
       });
     });
   }, []);
+
+  function addNode(node) { setNodes([...nodes, node]); }
+  function addLink(link) { setLinks([...links, link]); }
 
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()(document.getElementById("graph"));
@@ -85,8 +90,9 @@ export default function Graph() {
   return (
     <div>
       <TopBar resetGraph={resetGraph} />
+      <BottomBar />
       <div id="graph" className="h-screen w-screen" />
-      <Outlet />
+      <Outlet context={[addNode, addLink]} />
     </div>
   );
 }
