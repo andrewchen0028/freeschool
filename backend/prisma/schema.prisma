@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Link {
+  sourceNodeId                    String @db.VarChar(255)
+  targetNodeId                    String @db.VarChar(255)
+  nodes_links_sourceNodeIdTonodes Node  @relation("links_sourceNodeIdTonodes", fields: [sourceNodeId], references: [nodeId], onDelete: NoAction, onUpdate: NoAction)
+  nodes_links_targetNodeIdTonodes Node  @relation("links_targetNodeIdTonodes", fields: [targetNodeId], references: [nodeId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([sourceNodeId, targetNodeId])
+	@@map("links")
+}
+
+model Node {
+  nodeId                          String      @id @db.VarChar(255)
+  score                           Int?        @default(0)
+  links_links_sourceNodeIdTonodes Link[]     @relation("links_sourceNodeIdTonodes")
+  links_links_targetNodeIdTonodes Link[]     @relation("links_targetNodeIdTonodes")
+  resources                       Resource[]
+	@@map("nodes")
+}
+
+model Resource {
+  id     Int     @id @default(autoincrement())
+  nodeId String? @db.VarChar(255)
+  url    String  @unique @db.VarChar(255)
+  nodes  Node?  @relation(fields: [nodeId], references: [nodeId], onDelete: NoAction, onUpdate: NoAction)
+	@@map("resources")
+}
+

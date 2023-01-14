@@ -26,6 +26,7 @@ export function InlinkForm({ reload, addLink }) {
       stageSourceNodeId("");
       reload();
     }).catch((error) => {
+      console.log(error);
       setErrorFlag(error.response.status);
     });
   }
