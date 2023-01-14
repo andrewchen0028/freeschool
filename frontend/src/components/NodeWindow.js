@@ -47,6 +47,10 @@ function NodeWindowHeader() {
 // Note that <ItemListSelectors /> doesn't currently know about "params.nodeId"
 // like <NodeWindowHeader /> does. Therefore, <ItemListSelectors /> won't reset
 // to "resources" upon jumping to another node through "inlinks/outlinks".
+// 
+// TODO-low: Currently, if the user opens a NodeWindow and manually types a URL
+// extension (e.g. "inlinks"), the NodeWindow/ItemListSelector auto-redirects
+// to "resources". Make it not do this.
 function ItemListSelectors() {
   const [itemType, setItemType] = useState("resources");
 
