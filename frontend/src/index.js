@@ -15,7 +15,7 @@ root.render(
     <Routes>
       <Route path="/" element={<Graph />}>
         <Route path="createNode" element={<NodeForm />} />
-        <Route path=":nodeTitle" element={<NodeWindow />}>
+        <Route path=":nodeId/:nodeTitle" element={<NodeWindow />}>
           <Route path="resources" element={<ResourceList />} />
           <Route path="inlinks" element={<InlinkList />} />
           <Route path="outlinks" element={<OutlinkList />} />

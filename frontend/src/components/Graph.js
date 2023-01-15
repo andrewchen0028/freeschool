@@ -17,7 +17,6 @@ export default function Graph() {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const [hover, setHover] = useState();
-  const [currentNodeId, setCurrentNodeId] = useState();
 
   // Typedef here so we get intellisense on `graphRef.current` elsewhere
   /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
@@ -51,7 +50,6 @@ export default function Graph() {
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
-    // setCurrentNodeId(-1);
     function paintRing(node, color, ctx, radius) {
       ctx.beginPath();
       ctx.fillStyle = color;
@@ -82,9 +80,8 @@ export default function Graph() {
         node.__bckgRadius = ringRadius;
       })
       .onNodeHover((node) => { setHover(node); })
-      .onNodeClick((node) => { 
-        setCurrentNodeId(node.id);
-        navigate(`${node.title}`); 
+      .onNodeClick((node) => {
+        navigate(`${node.id}/${node.title}`);
       });
   }, [graphRef, hover, navigate]);
 
@@ -97,7 +94,7 @@ export default function Graph() {
       <TopBar resetGraph={resetGraph} />
       <BottomBar />
       <div id="graph" className="h-screen w-screen" />
-      <Outlet context={[addNode, addLink, currentNodeId]} />
+      <Outlet context={[addNode, addLink]} />
     </div>
   );
 }

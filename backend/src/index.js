@@ -1,10 +1,8 @@
 const cors = require("cors");
 const express = require("express");
 
-// const sequelize = require("./util/db");
 const prisma = require('./prisma');
 const { PrismaClientKnownRequestError } = require("@prisma/client/runtime");
-// const { Node, Link, Resource } = require("./models/index");
 const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
@@ -13,10 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// TODO-medium: Update Seuqelize error handlers to use "error.name"
-//              instead of "error.parent.code", which apparently
-//              doesn't exist on all errors. Also add error messages
-//              (console.warn).
+// TODO-medium: Update error handlers to use "error.name" instead of
+//              "error.parent.code", which apparently doesn't exist on
+//              all errors. Also add error messages (console.warn).
 
 // Called upon opening the graph from the homepage. Will eventually need to
 // filter item visibility by score somehow - maybe this should be done by
@@ -32,44 +29,64 @@ app.get("/", function getGraph(_, response) {
 });
 
 // Called upon opening a NodeWindow. Returns node metadata.
-// TODO-current: broken by integer nodeId, fix
 // (request.params.nodeId is of type string here, but needs to be int for db)
 app.get("/:nodeId", function getNodeWindow(request, response) {
   Node.findUnique({
     where: { id: parseInt(request.params.nodeId) },
   }).then((node) => {
     return response.json(node).status(200).end();
+  }).catch((error) => {
+    console.warn(`Error: ${error}`);
+    return response.status(500).end();
   });
 });
 
 // Called upon selecting Resources within a NodeWindow.
-// TODO-current: probably broken by integer nodeId, fix
+// this currently returns nothing because the RESET function isn't fixed yet
 app.get("/:nodeId/resources", function getNodeResources(request, response) {
   Resource.findMany({
-    where: { nodeId: request.params.nodeId }
+    where: { nodeId: parseInt(request.params.nodeId) }
   }).then((resources) => {
     return response.json(resources).status(200).end();
   });
 });
 
 // Called upon selecting Inlinks within a NodeWindow.
-// TODO-current: probably broken by integer nodeId, fix
 app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
+  // Maps findMany() result [{inlink}] to [{sourceNode, ...inlink}] to expose
+  // sourceNode metadata to frontend
   Link.findMany({
-    where: { targetNodeId: request.params.nodeId }
+    where: { target: parseInt(request.params.nodeId) }
   }).then((inlinks) => {
-    return response.json(inlinks).status(200).end();
+    Promise.all(inlinks.map((inlink) => (
+      Node.findUnique({ where: { id: inlink.source } })
+        .then((sourceNode) => ({ sourceNode, ...inlink }))
+    ))).then((inlinks) => {
+      return response.json(inlinks).status(200).end();
+    });
+  }).catch((error) => {
+    console.warn(`Error getting inlinks: ${error}`);
+    return response.status(500).end();
   });
 });
 
 // Called upon selecting Outlinks within a NodeWindow.
-// TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge GET endpoints for inlinks/outlinks
 app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
+  // Maps findMany() result [{outlink}] to [{targetNode, ...outlink}] to expose
+  // targetNode metadata to frontend
   Link.findMany({
-    where: { sourceNodeId: request.params.nodeId }
+    where: { source: parseInt(request.params.nodeId) }
   }).then((outlinks) => {
-    return response.json(outlinks).status(200).end();
+    Promise.all(outlinks.map((outlink) => (
+      Node.findUnique({ where: { id: outlink.target } })
+        .then((targetNode) => ({ targetNode, ...outlink }))
+    ))).then((outlinks) => {
+      return response.json(outlinks).status(200).end();
+    });
+  }).catch((error) => {
+    console.warn(`Error getting outlinks: ${error}`);
+    return response.status(500).end();
   });
 });
 
@@ -218,15 +235,14 @@ app.delete("/", async function resetDatabase(_, response) {
 
   await Link.create({ data: { id: 0, source: 0, target: 1 } });
 
-  // TODO-current: probably broken by integer nodeId, fix
-  // await Resource.createMany({
-  //   data: [
-  //     { nodeId: "Calculus-1", url: "https://www.fbi.gov" },
-  //     { nodeId: "Calculus-1", url: "https://www.atf.gov" },
-  //     { nodeId: "Calculus-2", url: "https://www.nsa.gov" },
-  //     { nodeId: "Calculus-2", url: "https://www.cia.gov" },
-  //   ]
-  // });
+  await Resource.createMany({
+    data: [
+      { nodeId: 0, url: "https://www.fbi.gov" },
+      { nodeId: 0, url: "https://www.atf.gov" },
+      { nodeId: 1, url: "https://www.nsa.gov" },
+      { nodeId: 1, url: "https://www.cia.gov" },
+    ]
+  });
 
   return response.status(200).end();
 }

@@ -11,27 +11,23 @@ function NodeWindowSideBar() {
 }
 
 
-function NodeWindowHeader({currentNodeId}) {
+function NodeWindowHeader({ nodeId }) {
   const [nodeMetadata, setNodeMetadata] = useState();
 
-  
-
   function vote(type) {
-  axios.post(`${url}/${currentNodeId}/vote/${type}`).then(reload);
+    axios.post(`${url}/${nodeId}/vote/${type}`).then(reload);
   }
 
   function reload() {
-    console.log(currentNodeId);
-    axios.get(`${url}/${currentNodeId}`).then((response) => {
-      console.log(response.data);
+    axios.get(`${url}/${nodeId}`).then((response) => {
       setNodeMetadata(response.data);
     });
   }
 
-  useEffect(reload, [currentNodeId]);
-  
+  useEffect(reload, [nodeId]);
+
   return (!nodeMetadata ? <div /> :
-  <div className="flex items-center gap-2 text-xl">
+    <div className="flex items-center gap-2 text-xl">
       {/* VOTE BUTTONS */}
       <div className="p-2 flex flex-col items-center">
         <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
@@ -90,14 +86,15 @@ function ItemListSelectors() {
 //              warning of this situation, and interacting with the buttons on
 //              the page will silent-crash the backend.
 export default function NodeWindow() {
-  const [, addLink, currentNodeId] = useOutletContext();
+  const [, addLink] = useOutletContext();
+  const { nodeId } = useParams();
 
   return (
     <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
       <NodeWindowSideBar />
       <div className="w-3/5 bg-white overflow-y-scroll">
-        <NodeWindowHeader currentNodeId={currentNodeId}/>
-        <ItemListSelectors/>
+        <NodeWindowHeader nodeId={nodeId} />
+        <ItemListSelectors />
         <Outlet context={[addLink]} />
       </div>
       <NodeWindowSideBar />

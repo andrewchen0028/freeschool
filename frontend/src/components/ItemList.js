@@ -14,27 +14,27 @@ import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 function ItemList({ Form, Card, ext }) {
   const [cards, setCards] = useState([]);
 
-  const [addLink, currentNodeId] = useOutletContext();
-  useEffect(() => {
-    console.log("shit", currentNodeId)
-  }, [currentNodeId]);
+  const [addLink] = useOutletContext();
+  const { nodeId } = useParams();
 
-  const reload = useCallback(() => {if (currentNodeId) {
-    axios.get(`${url}/${currentNodeId}/${ext}`).then((response) => {
-      setCards(response.data.length > 0
-        // Note: calling "item.id" requires all items to have an "id" field;
-        // currently e.g. Node has "nodeId" and Link has a composite PK.
-        // 
-        // WARNING: using "index" parameter from map() is not recommended,
-        // only used as a temporary solution here.
-        // 
-        // TODO-high: Give each DB model an "id" field. Then, replace "index"
-        // with "item.id".`
-        ? response.data.map((item, index) => {
-          return (<Card item={item} key={index} />);
-        }) : <div className="card">None</div>);
-    });
-  }}, [currentNodeId, ext]);
+  const reload = useCallback(() => {
+    if (nodeId) {
+      axios.get(`${url}/${nodeId}/${ext}`).then((response) => {
+        setCards(response.data.length > 0
+          // Note: calling "item.id" requires all items to have an "id" field;
+          // currently e.g. Node has "nodeId" and Link has a composite PK.
+          // 
+          // WARNING: using "index" parameter from map() is not recommended,
+          // only used as a temporary solution here.
+          // 
+          // TODO-high: Give each DB model an "id" field. Then, replace "index"
+          // with "item.id".`
+          ? response.data.map((item, index) => {
+            return (<Card item={item} key={index} />);
+          }) : <div className="card">None</div>);
+      });
+    }
+  }, [nodeId, ext]);
 
   useEffect(reload, [reload]);
 

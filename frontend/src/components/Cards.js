@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 export function InlinkCard({ item: inlink }) {
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.sourceNodeId}`}
+      from <Link to={`../../${inlink.source}/${inlink.sourceNode.title}`}
         className="text-blue-600 underline">
-        {inlink.sourceNodeId.replace("-", " ")}
+        {inlink.sourceNode.title}
       </Link>
     </div>
   );
@@ -14,9 +14,9 @@ export function InlinkCard({ item: inlink }) {
 export function OutlinkCard({ item: outlink }) {
   return (
     <div className="card z-10">
-      to <Link to={`../../${outlink.targetNodeId}`}
+      to <Link to={`../../${outlink.target}/${outlink.targetNode.title}`}
         className="text-blue-600 underline">
-        {outlink.targetNodeId.replace("-", " ")}
+        {outlink.targetNode.title}
       </Link>
     </div>
   );
