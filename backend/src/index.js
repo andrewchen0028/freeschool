@@ -1,10 +1,8 @@
 const cors = require("cors");
 const express = require("express");
 
-// const sequelize = require("./util/db");
 const prisma = require('./prisma');
 const { PrismaClientKnownRequestError } = require("@prisma/client/runtime");
-// const { Node, Link, Resource } = require("./models/index");
 const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
@@ -13,15 +11,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// TODO-medium: Update Seuqelize error handlers to use "error.name"
-//              instead of "error.parent.code", which apparently
-//              doesn't exist on all errors. Also add error messages
-//              (console.warn).
+// TODO-medium: Update error handlers to use "error.name" instead of
+//              "error.parent.code", which apparently doesn't exist on
+//              all errors. Also add error messages (console.warn).
 
-// Called upon opening the graph from the homepage. Will eventually need to
-// filter item visibility by score somehow - maybe this should be done by
-// the client to avoid round-trip delay when using the score filter slider?
-// (Also to avoid increasing server load with number of clients)
+// Called upon opening the graph from the homepage. Returns nodes and links.
 app.get("/", function getGraph(_, response) {
   Promise.all([
     Node.findMany(),
@@ -31,8 +25,8 @@ app.get("/", function getGraph(_, response) {
   });
 });
 
-// Called upon opening a NodeWindow. Returns node metadata.
 // TODO-current: broken by integer nodeId, fix
+// Called upon opening a NodeWindow. Returns node metadata.
 // (request.params.nodeId is of type string here, but needs to be int for db)
 app.get("/:nodeId", function getNodeWindow(request, response) {
   Node.findUnique({
@@ -42,8 +36,8 @@ app.get("/:nodeId", function getNodeWindow(request, response) {
   });
 });
 
-// Called upon selecting Resources within a NodeWindow.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon selecting Resources within a NodeWindow.
 app.get("/:nodeId/resources", function getNodeResources(request, response) {
   Resource.findMany({
     where: { nodeId: request.params.nodeId }
@@ -52,8 +46,8 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
   });
 });
 
-// Called upon selecting Inlinks within a NodeWindow.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon selecting Inlinks within a NodeWindow.
 app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
   Link.findMany({
     where: { targetNodeId: request.params.nodeId }
@@ -62,9 +56,9 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
   });
 });
 
-// Called upon selecting Outlinks within a NodeWindow.
 // TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge GET endpoints for inlinks/outlinks
+// Called upon selecting Outlinks within a NodeWindow.
 app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
   Link.findMany({
     where: { sourceNodeId: request.params.nodeId }
@@ -73,8 +67,8 @@ app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
   });
 });
 
-// Called upon posting a node.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon posting a node.
 app.post("/node", function postNode(request, response) {
   Node.create({
     data: {
@@ -91,8 +85,8 @@ app.post("/node", function postNode(request, response) {
     });
 });
 
-// Called upon posting a node vote.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon posting a node vote.
 app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
   switch (request.params.vote) {
     case "upvote":
@@ -113,8 +107,8 @@ app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
   }
 });
 
-// Called upon posting a resource.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon posting a resource.
 app.post("/:nodeId/resource", function postResource(request, response) {
   Resource.create({
     data: {
@@ -146,8 +140,8 @@ app.post("/:nodeId/resource", function postResource(request, response) {
     });
 });
 
-// Called upon posting an inlink.
 // TODO-current: probably broken by integer nodeId, fix
+// Called upon posting an inlink.
 app.post("/:nodeId/inlink", function postInlink(request, response) {
   Link.create({
     data: {
@@ -173,9 +167,9 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
     });
 });
 
-// Called upon posting an outlink.
 // TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge POST endpoints for inlinks/outlinks
+// Called upon posting an outlink.
 app.post("/:nodeId/outlink", function outInlink(request, response) {
   Link.create({
     data: {

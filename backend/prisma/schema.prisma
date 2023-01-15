@@ -13,8 +13,6 @@ model Link {
   targetNode Node @relation("targetNodeIdToNode", fields: [target], references: [id])
   source     Int
   target     Int
-  // nodes_links_sourceNodeIdTonodes Node   @relation("links_sourceNodeIdTonodes", fields: [sourceNodeId], references: [nodeId], onDelete: NoAction, onUpdate: NoAction)
-  // nodes_links_targetNodeIdTonodes Node   @relation("links_targetNodeIdTonodes", fields: [targetNodeId], references: [nodeId], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("links")
 }
@@ -25,8 +23,6 @@ model Node {
   title              String
   sourceNodeIdToNode Link[]     @relation("sourceNodeIdToNode")
   targetNodeIdToNode Link[]     @relation("targetNodeIdToNode")
-  // links_links_sourceNodeIdTonodes Link[]     @relation("links_sourceNodeIdTonodes")
-  // links_links_targetNodeIdTonodes Link[]     @relation("links_targetNodeIdTonodes")
   resources          Resource[]
 
   @@map("nodes")
