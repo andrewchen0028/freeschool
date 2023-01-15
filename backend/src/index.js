@@ -6,7 +6,7 @@ const prisma = require('./prisma');
 const { PrismaClientKnownRequestError } = require("@prisma/client/runtime");
 // const { Node, Link, Resource } = require("./models/index");
 const Node = prisma.node;
-const Link = prisma.Link;
+const Link = prisma.link;
 const Resource = prisma.resource;
 
 const app = express();
@@ -24,33 +24,26 @@ app.use(cors());
 // (Also to avoid increasing server load with number of clients)
 app.get("/", function getGraph(_, response) {
   Promise.all([
-    Node.findMany().then((nodes) => {
-      return nodes.map((node) => ({
-        id: node.nodeId
-      }));
-    }),
-    Link.findMany().then((links) => {
-      return links.map((link) => ({
-        id: link.id,
-        source: link.sourceNodeId,
-        target: link.targetNodeId,
-      }));
-    })
+    Node.findMany(),
+    Link.findMany()
   ]).then(([nodes, links]) => {
     return response.json({ nodes, links }).status(200).end();
   });
 });
 
 // Called upon opening a NodeWindow. Returns node metadata.
+// TODO-current: broken by integer nodeId, fix
+// (request.params.nodeId is of type string here, but needs to be int for db)
 app.get("/:nodeId", function getNodeWindow(request, response) {
   Node.findUnique({
-    where: { nodeId: request.params.nodeId },
+    where: { id: request.params.nodeId },
   }).then((node) => {
     return response.json(node).status(200).end();
   });
 });
 
 // Called upon selecting Resources within a NodeWindow.
+// TODO-current: probably broken by integer nodeId, fix
 app.get("/:nodeId/resources", function getNodeResources(request, response) {
   Resource.findMany({
     where: { nodeId: request.params.nodeId }
@@ -60,6 +53,7 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
 });
 
 // Called upon selecting Inlinks within a NodeWindow.
+// TODO-current: probably broken by integer nodeId, fix
 app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
   Link.findMany({
     where: { targetNodeId: request.params.nodeId }
@@ -69,6 +63,7 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
 });
 
 // Called upon selecting Outlinks within a NodeWindow.
+// TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge GET endpoints for inlinks/outlinks
 app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
   Link.findMany({
@@ -79,6 +74,7 @@ app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
 });
 
 // Called upon posting a node.
+// TODO-current: probably broken by integer nodeId, fix
 app.post("/node", function postNode(request, response) {
   Node.create({
     data: {
@@ -96,8 +92,9 @@ app.post("/node", function postNode(request, response) {
 });
 
 // Called upon posting a node vote.
+// TODO-current: probably broken by integer nodeId, fix
 app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
-  switch (request.params.vote){
+  switch (request.params.vote) {
     case "upvote":
       await Node.update({
         data: { score: { increment: 1 } },
@@ -117,6 +114,7 @@ app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
 });
 
 // Called upon posting a resource.
+// TODO-current: probably broken by integer nodeId, fix
 app.post("/:nodeId/resource", function postResource(request, response) {
   Resource.create({
     data: {
@@ -149,6 +147,7 @@ app.post("/:nodeId/resource", function postResource(request, response) {
 });
 
 // Called upon posting an inlink.
+// TODO-current: probably broken by integer nodeId, fix
 app.post("/:nodeId/inlink", function postInlink(request, response) {
   Link.create({
     data: {
@@ -175,6 +174,7 @@ app.post("/:nodeId/inlink", function postInlink(request, response) {
 });
 
 // Called upon posting an outlink.
+// TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge POST endpoints for inlinks/outlinks
 app.post("/:nodeId/outlink", function outInlink(request, response) {
   Link.create({
@@ -206,33 +206,27 @@ app.delete("/", async function resetDatabase(_, response) {
 
   // Had to change order to keep referential integrity - would be better if we could set "cascade: true" here
   await Link.deleteMany();
-  await prisma.resource.deleteMany();
+  await Resource.deleteMany();
   await Node.deleteMany();
 
   await Node.createMany({
     data: [
-      { nodeId: "Calculus-1" },
-      { nodeId: "Calculus-2" }
+      { id: 0, title: "Calculus 1" },
+      { id: 1, title: "Calculus 2" },
     ]
   });
 
-  await Link.create({
-    data: {
-      sourceNodeId: "Calculus-1",
-      targetNodeId: "Calculus-2"
-    }
-  });
+  await Link.create({ data: { id: 0, source: 0, target: 1 } });
 
-  await Resource.createMany({
-    data: [
-      { nodeId: "Calculus-1", url: "https://www.fbi.gov" },
-      { nodeId: "Calculus-1", url: "https://www.atf.gov" },
-      { nodeId: "Calculus-2", url: "https://www.nsa.gov" },
-      { nodeId: "Calculus-2", url: "https://www.cia.gov" },
-    ]
-  });
-
-  // await prisma.$transaction([deleteProfile, deletePosts, deleteUsers])
+  // TODO-current: probably broken by integer nodeId, fix
+  // await Resource.createMany({
+  //   data: [
+  //     { nodeId: "Calculus-1", url: "https://www.fbi.gov" },
+  //     { nodeId: "Calculus-1", url: "https://www.atf.gov" },
+  //     { nodeId: "Calculus-2", url: "https://www.nsa.gov" },
+  //     { nodeId: "Calculus-2", url: "https://www.cia.gov" },
+  //   ]
+  // });
 
   return response.status(200).end();
 }

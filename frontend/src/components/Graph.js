@@ -76,7 +76,7 @@ export default function Graph() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = colors.orange[600];
-        ctx.fillText(node.id.replace("-", " "), node.x, node.y);
+        ctx.fillText(node.id, node.x, node.y);
         node.__bckgRadius = ringRadius;
       })
       .onNodeHover((node) => { setHover(node); })

@@ -1,3 +1,4 @@
+// TODO-deprecate: yeet this out of codebase
 const { Sequelize } = require("sequelize");
 
 const credentials = require("./db.json");

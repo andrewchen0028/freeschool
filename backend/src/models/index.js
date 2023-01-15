@@ -1,3 +1,4 @@
+// TODO-deprecate: yeet this out of codebase
 const sequelize = require("../util/db");
 
 const Node = require("./Node");

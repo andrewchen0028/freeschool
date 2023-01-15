@@ -1,3 +1,4 @@
+// TODO-deprecate: yeet this out of codebase
 const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 
