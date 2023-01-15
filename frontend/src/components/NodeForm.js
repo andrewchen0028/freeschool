@@ -4,14 +4,14 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import url from "..";
 
 export default function NodeForm() {
-  const [stagedNodeId, stageNodeId] = useState("");
+  const [stagedTitle, stageTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState();
 
   const [addNode] = useOutletContext();
   const navigate = useNavigate();
 
   function handleChange(event) {
-    stageNodeId(event.target.value);
+    stageTitle(event.target.value);
     setErrorFlag();
   }
 
@@ -19,10 +19,11 @@ export default function NodeForm() {
     event.preventDefault();
 
     axios.post(`${url}/node`, {
-      nodeId: stagedNodeId.replace(" ", "-")
-    }).then(() => {
-      addNode({ id: stagedNodeId.replace(" ", "-") });
-      navigate(`../${stagedNodeId.replace(" ", "-")}`);
+      title: stagedTitle
+    }).then((response) => {
+      let node = response.data;
+      addNode({ id: node.id, title: node.title });
+      navigate(`../${node.id}/${node.title}`);
     }).catch((error) => {
       setErrorFlag(error.response.status);
     });
@@ -48,7 +49,7 @@ export default function NodeForm() {
         {errorFlag}
         <form onSubmit={handleSubmit}>
           <input className="card" placeholder="Node Title" required="required"
-            value={stagedNodeId} onChange={handleChange} />
+            value={stagedTitle} onChange={handleChange} />
           <button className="button" type="submit">Submit</button>
         </form>
       </div>

@@ -91,25 +91,21 @@ app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
 });
 
 // Called upon posting a node.
-// TODO-current: probably broken by integer nodeId, fix
 app.post("/node", function postNode(request, response) {
   Node.create({
-    data: {
-      nodeId: request.body.nodeId
-    }
-  }).then(() => {
-    return response.status(200).end();
+    data: { title: request.body.title }
+  }).then((node) => {
+    return response.json(node).status(200).end();
   }).catch(
     /** @param {PrismaClientKnownRequestError} error */
     (error) => {
       // TODO-low: add error handling (e.g. duplicate node)
-      console.warn(`Failed to add node ${request.body.nodeId}:\n${error}`);
+      console.warn(`Failed to add node ${request.body.title}:\n${error}`);
       return response.status(500).end();
     });
 });
 
 // Called upon posting a node vote.
-// TODO-current: probably broken by integer nodeId, fix
 app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
   switch (request.params.vote) {
     case "upvote":
@@ -131,33 +127,24 @@ app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
 });
 
 // Called upon posting a resource.
-// TODO-current: probably broken by integer nodeId, fix
 app.post("/:nodeId/resource", function postResource(request, response) {
   Resource.create({
     data: {
       url: request.body.url,
-      nodeId: request.params.nodeId
+      node: { connect: { id: parseInt(request.params.nodeId) } }
     }
   }).then(() => {
     return response.status(200).end();
   }).catch(/** @param {PrismaClientKnownRequestError} error */
     (error) => {
-      switch (error.name) {
-        case "SequelizeValidationError":
-          console.warn(`Attempted to add resource with invalid URL:
-          ${request.body.url}`);
-          return response.status(400).end();
-        case "SequelizeForeignKeyConstraintError":
-          console.warn(`Attempted to add resource on non-existent node:
-          ${request.params.nodeId}`);
-          return response.status(404).end();
-        case "SequelizeUniqueConstraintError":
-          console.warn(`Attempted to add duplicate resource:
-          ${request.body.url}`);
+      switch (error.code) {
+        case "P2002":
+          console.warn(`Attempted to add duplicate resource: `
+            + `${request.body.url}`);
           return response.status(409).end();
         default:
-          console.warn(`Failed to add resource ${request.body.url}:
-          \n${error}`);
+          console.warn(`Failed to add resource ${request.body.url}: `
+            + `${error}`);
           return response.status(500).end();
       }
     });
