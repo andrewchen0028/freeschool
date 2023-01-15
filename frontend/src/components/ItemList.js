@@ -14,11 +14,13 @@ import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 function ItemList({ Form, Card, ext }) {
   const [cards, setCards] = useState([]);
 
-  const { nodeId } = useParams();
-  const [addLink] = useOutletContext();
+  const [addLink, currentNodeId] = useOutletContext();
+  useEffect(() => {
+    console.log("shit", currentNodeId)
+  }, [currentNodeId]);
 
-  const reload = useCallback(() => {
-    axios.get(`${url}/${nodeId}/${ext}`).then((response) => {
+  const reload = useCallback(() => {if (currentNodeId) {
+    axios.get(`${url}/${currentNodeId}/${ext}`).then((response) => {
       setCards(response.data.length > 0
         // Note: calling "item.id" requires all items to have an "id" field;
         // currently e.g. Node has "nodeId" and Link has a composite PK.
@@ -32,7 +34,7 @@ function ItemList({ Form, Card, ext }) {
           return (<Card item={item} key={index} />);
         }) : <div className="card">None</div>);
     });
-  }, [nodeId, ext]);
+  }}, [currentNodeId, ext]);
 
   useEffect(reload, [reload]);
 

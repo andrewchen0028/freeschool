@@ -36,7 +36,7 @@ app.get("/", function getGraph(_, response) {
 // (request.params.nodeId is of type string here, but needs to be int for db)
 app.get("/:nodeId", function getNodeWindow(request, response) {
   Node.findUnique({
-    where: { id: request.params.nodeId },
+    where: { id: parseInt(request.params.nodeId) },
   }).then((node) => {
     return response.json(node).status(200).end();
   });
@@ -98,13 +98,13 @@ app.post("/:nodeId/vote/:vote", async function postNodeVote(request, response) {
     case "upvote":
       await Node.update({
         data: { score: { increment: 1 } },
-        where: { nodeId: request.params.nodeId }
+        where: { id: parseInt(request.params.nodeId) }
       });
       return response.status(200).end();
     case "downvote":
       await Node.update({
         data: { score: { decrement: 1 } },
-        where: { nodeId: request.params.nodeId }
+        where: { id: parseInt(request.params.nodeId) }
       });
       return response.status(200).end();
     default:

@@ -17,6 +17,7 @@ export default function Graph() {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
   const [hover, setHover] = useState();
+  const [currentNodeId, setCurrentNodeId] = useState();
 
   // Typedef here so we get intellisense on `graphRef.current` elsewhere
   /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
@@ -50,6 +51,7 @@ export default function Graph() {
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
+    // setCurrentNodeId(-1);
     function paintRing(node, color, ctx, radius) {
       ctx.beginPath();
       ctx.fillStyle = color;
@@ -66,7 +68,7 @@ export default function Graph() {
       })
       .nodeCanvasObject((node, ctx, globalScale) => {
         const fontSize = graphRef.current.zoom() * 4 / globalScale;
-        const ringRadius = 2 + ctx.measureText(node.id).width / 2;
+        const ringRadius = 2 + ctx.measureText(node.title).width / 2;
         const ringColor = node === hover
           ? colors.neutral[400]
           : colors.neutral[300];
@@ -76,11 +78,14 @@ export default function Graph() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = colors.orange[600];
-        ctx.fillText(node.id, node.x, node.y);
+        ctx.fillText(node.title, node.x, node.y);
         node.__bckgRadius = ringRadius;
       })
       .onNodeHover((node) => { setHover(node); })
-      .onNodeClick((node) => { navigate(`${node.id}`); });
+      .onNodeClick((node) => { 
+        setCurrentNodeId(node.id);
+        navigate(`${node.title}`); 
+      });
   }, [graphRef, hover, navigate]);
 
   useEffect(function redrawGraph() {
@@ -92,7 +97,7 @@ export default function Graph() {
       <TopBar resetGraph={resetGraph} />
       <BottomBar />
       <div id="graph" className="h-screen w-screen" />
-      <Outlet context={[addNode, addLink]} />
+      <Outlet context={[addNode, addLink, currentNodeId]} />
     </div>
   );
 }
