@@ -4,7 +4,4 @@
 # database credentials
 .env
 
-# TODO-deprecate: yeet this out of codebase
-/src/util/db.json
-
 graveyard

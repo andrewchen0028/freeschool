@@ -151,63 +151,40 @@ app.post("/:nodeId/resource", function postResource(request, response) {
 });
 
 // Called upon posting an inlink.
-// TODO-current: probably broken by integer nodeId, fix
-app.post("/:nodeId/inlink", function postInlink(request, response) {
-  console.log(request.body.sourceNodeId);
+app.post("/:nodeId/inlink", async function postInlink(request, response) {
+  // TODO-medium: Update this to find unique after requiring title to be unique
+  let sourceNode = await Node.findFirst({where: {title: request.body.sourceNodeTitle}});
+
   Link.create({
     data: {
-      sourceNode: { connect: { id: parseInt(request.body.sourceNodeId) } },
+      sourceNode: { connect: { id: sourceNode.id } },
       targetNode: { connect: { id: parseInt(request.params.nodeId) } }
-      // sourceNodeId: request.body.sourceNodeId,
-      // targetNodeId: request.params.nodeId,
     }
-  }).then(() => {
-    return response.status(200).end();
+  }).then((inlink) => {
+    return response.json(inlink).status(200).end();
   }).catch(/** @param {PrismaClientKnownRequestError} error */
     (error) => {
       console.warn(error);
-      // add error switch statement here
-
-      // switch (error.code) {
-      //   case "P2003":
-      //     console.warn(`Attempted to add inlink with non-existent source
-      //     ${request.body.sourceNodeId}`);
-      //     return response.status(404).end();
-      //   case "P2002":
-      //     console.warn(`Attempted to add duplicate inlink`);
-      //     return response.status(409).end();
-      //   default:
-      //     console.warn(`Failed to add link\n${error}`);
-      //     break;
-      // }
+      // TODO-medium: Add actual error handling
+      return response.status(500).end();
     });
 });
 
 // Called upon posting an outlink.
-// TODO-current: probably broken by integer nodeId, fix
 // TODO-low: merge POST endpoints for inlinks/outlinks
-app.post("/:nodeId/outlink", function outInlink(request, response) {
+app.post("/:nodeId/outlink", async function postOutlink(request, response) {
+  let targetNode = await Node.findFirst({where: {title: request.body.targetNodeTitle}});
   Link.create({
     data: {
-      sourceNodeId: request.params.nodeId,
-      targetNodeId: request.body.targetNodeId,
+      sourceNode: { connect: { id: parseInt(request.params.nodeId) } },
+      targetNode: { connect: { id: targetNode.id } }
     }
-  }).then(() => {
-    return response.status(200).end();
+  }).then((outlink) => {
+    return response.json(outlink).status(200).end();
   }).catch(/** @param {PrismaClientKnownRequestError} error */
     (error) => {
-      switch (error.code) {
-        case "P2003":
-          console.warn(`Attempted to add outlink with non-existent target
-          ${request.body.sourceNodeId}`);
-          return response.status(404).end();
-        case "P2002":
-          console.warn(`Attempted to add duplicate outlink`);
-          return response.status(409).end();
-        default:
-          console.warn(`Failed to add link\n${error}`);
-          break;
-      }
+      console.warn(error);
+      return response.status(500).end();
     });
 });
 

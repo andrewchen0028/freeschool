@@ -19,6 +19,7 @@ model Link {
   @@map("links")
 }
 
+// TODO-medium: Require Node title to be unique
 model Node {
   id                 Int        @id @default(autoincrement())
   score              Int        @default(0)

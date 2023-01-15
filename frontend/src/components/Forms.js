@@ -4,12 +4,12 @@ import { useParams } from "react-router-dom";
 import url from "..";
 
 export function InlinkForm({ reload, addLink }) {
-  const [stagedSourceNodeId, stageSourceNodeId] = useState("");
+  const [sourceNodeTitle, setSourceNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState();
   const { nodeId } = useParams();
 
   function handleChange(event) {
-    stageSourceNodeId(event.target.value);
+    setSourceNodeTitle(event.target.value);
     setErrorFlag();
   }
 
@@ -17,13 +17,13 @@ export function InlinkForm({ reload, addLink }) {
     event.preventDefault();
 
     axios.post(`${url}/${nodeId}/inlink`, {
-      sourceNodeId: stagedSourceNodeId.replace(" ", "-")
-    }).then(() => {
+      sourceNodeTitle: sourceNodeTitle
+    }).then((response) => {
       addLink({
-        source: stagedSourceNodeId.replace(" ", "-"),
-        target: nodeId.replace(" ", "-")
+        source: response.data.source,
+        target: response.data.target,
       });
-      stageSourceNodeId("");
+      setSourceNodeTitle("");
       reload();
     }).catch((error) => {
       console.log(error);
@@ -34,12 +34,12 @@ export function InlinkForm({ reload, addLink }) {
   return (
     <div className="card">
       {errorFlag === 409 && <p className="text-red-500">
-        {`Inlink from "${stagedSourceNodeId}" already exists`}</p>}
+        {`Inlink from "${sourceNodeTitle}" already exists`}</p>}
       {errorFlag === 404 && <p className="text-red-500">
-        {`Source node "${stagedSourceNodeId}" not found`}</p>}
+        {`Source node "${sourceNodeTitle}" not found`}</p>}
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Source Node" required="required"
-          value={stagedSourceNodeId} onChange={handleChange} />
+          value={sourceNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
     </div>
@@ -47,12 +47,12 @@ export function InlinkForm({ reload, addLink }) {
 }
 
 export function OutlinkForm({ reload, addLink }) {
-  const [stagedTargetNodeId, stageTargetNodeId] = useState("");
+  const [targetNodeTitle, setTargetNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState();
   const { nodeId } = useParams();
 
   function handleChange(event) {
-    stageTargetNodeId(event.target.value);
+    setTargetNodeTitle(event.target.value);
     setErrorFlag();
   }
 
@@ -60,13 +60,13 @@ export function OutlinkForm({ reload, addLink }) {
     event.preventDefault();
 
     axios.post(`${url}/${nodeId}/outlink`, {
-      targetNodeId: stagedTargetNodeId.replace(" ", "-")
-    }).then(() => {
+      targetNodeTitle: targetNodeTitle
+    }).then((response) => {
       addLink({
-        source: nodeId.replace(" ", "-"),
-        target: stagedTargetNodeId.replace(" ", "-")
+        source: response.data.source,
+        target: response.data.target,
       });
-      stageTargetNodeId("");
+      setTargetNodeTitle("");
       reload();
     }).catch((error) => {
       setErrorFlag(error.response.status);
@@ -76,12 +76,12 @@ export function OutlinkForm({ reload, addLink }) {
   return (
     <div className="card">
       {errorFlag === 409 && <p className="text-red-500">
-        {`Outlink to "${stagedTargetNodeId}" already exists`}</p>}
+        {`Outlink to "${targetNodeTitle}" already exists`}</p>}
       {errorFlag === 404 && <p className="text-red-500">
-        {`Target node "${stagedTargetNodeId}" not found`}</p>}
+        {`Target node "${targetNodeTitle}" not found`}</p>}
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Target Node" required="required"
-          value={stagedTargetNodeId} onChange={handleChange} />
+          value={targetNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
     </div>

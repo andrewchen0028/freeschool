@@ -27,7 +27,7 @@ function ItemList({ Form, Card, ext }) {
           // WARNING: using "index" parameter from map() is not recommended,
           // only used as a temporary solution here.
           // 
-          // TODO-high: Give each DB model an "id" field. Then, replace "index"
+          // TODO-medium: Give each DB model an "id" field. Then, replace "index"
           // with "item.id".`
           ? response.data.map((item, index) => {
             return (<Card item={item} key={index} />);
