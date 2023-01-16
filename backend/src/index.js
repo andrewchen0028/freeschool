@@ -11,10 +11,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// TODO-medium: Update error handlers to use "error.name" instead of
-//              "error.parent.code", which apparently doesn't exist on
-//              all errors. Also add error messages (console.warn).
-
 // Called upon opening the graph from the homepage. Will eventually need to
 // filter item visibility by score somehow - maybe this should be done by
 // the client to avoid round-trip delay when using the score filter slider?
@@ -25,6 +21,9 @@ app.get("/", function getGraph(_, response) {
     Link.findMany()
   ]).then(([nodes, links]) => {
     return response.json({ nodes, links }).status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get graph: ${error}`);
+    return response.status(500).end();
   });
 });
 
@@ -36,7 +35,7 @@ app.get("/:nodeId", function getNodeWindow(request, response) {
   }).then((node) => {
     return response.json(node).status(200).end();
   }).catch((error) => {
-    console.warn(`Error: ${error}`);
+    console.warn(`Failed to get node: ${error}`);
     return response.status(500).end();
   });
 });
@@ -48,6 +47,9 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
     where: { nodeId: parseInt(request.params.nodeId) }
   }).then((resources) => {
     return response.json(resources).status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get resources: ${error}`);
+    return response.status(500).end();
   });
 });
 
@@ -65,7 +67,7 @@ app.get("/:nodeId/inlinks", function getNodeInlinks(request, response) {
       return response.json(inlinks).status(200).end();
     });
   }).catch((error) => {
-    console.warn(`Error getting inlinks: ${error}`);
+    console.warn(`Failed to get inlinks: ${error}`);
     return response.status(500).end();
   });
 });
@@ -85,7 +87,7 @@ app.get("/:nodeId/outlinks", function getNodeOutlinks(request, response) {
       return response.json(outlinks).status(200).end();
     });
   }).catch((error) => {
-    console.warn(`Error getting outlinks: ${error}`);
+    console.warn(`Failed to get outlinks: ${error}`);
     return response.status(500).end();
   });
 });
@@ -97,11 +99,17 @@ app.post("/node", function postNode(request, response) {
   }).then((node) => {
     return response.json(node).status(200).end();
   }).catch(
-    /** @param {PrismaClientKnownRequestError} error */
     (error) => {
-      // TODO-low: add error handling (e.g. duplicate node)
-      console.warn(`Failed to add node ${request.body.title}:\n${error}`);
-      return response.status(500).end();
+      switch (error.code) {
+        case "P2002":
+          console.warn(`Attempted to add duplicate node: `
+            + `${request.body.title}`);
+          return response.status(409).end();
+        default:
+          console.warn(`Failed to add node ${request.body.title}: `
+            + `${error}`);
+          return response.status(500).end();
+      }
     });
 });
 
@@ -152,8 +160,7 @@ app.post("/:nodeId/resource", function postResource(request, response) {
 
 // Called upon posting an inlink.
 app.post("/:nodeId/inlink", async function postInlink(request, response) {
-  // TODO-medium: Update this to find unique after requiring title to be unique
-  let sourceNode = await Node.findFirst({where: {title: request.body.sourceNodeTitle}});
+  let sourceNode = await Node.findUnique({ where: { title: request.body.sourceNodeTitle } });
 
   Link.create({
     data: {
@@ -173,7 +180,7 @@ app.post("/:nodeId/inlink", async function postInlink(request, response) {
 // Called upon posting an outlink.
 // TODO-low: merge POST endpoints for inlinks/outlinks
 app.post("/:nodeId/outlink", async function postOutlink(request, response) {
-  let targetNode = await Node.findFirst({where: {title: request.body.targetNodeTitle}});
+  let targetNode = await Node.findFirst({ where: { title: request.body.targetNodeTitle } });
   Link.create({
     data: {
       sourceNode: { connect: { id: parseInt(request.params.nodeId) } },
@@ -190,7 +197,6 @@ app.post("/:nodeId/outlink", async function postOutlink(request, response) {
 
 // DEBUG ONLY
 app.delete("/", async function resetDatabase(_, response) {
-
   // Had to change order to keep referential integrity - would be better if we could set "cascade: true" here
   await Link.deleteMany();
   await Resource.deleteMany();

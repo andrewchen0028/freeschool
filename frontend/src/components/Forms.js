@@ -33,10 +33,16 @@ export function InlinkForm({ reload, addLink }) {
 
   return (
     <div className="card">
-      {errorFlag === 409 && <p className="text-red-500">
-        {`Inlink from "${sourceNodeTitle}" already exists`}</p>}
-      {errorFlag === 404 && <p className="text-red-500">
-        {`Source node "${sourceNodeTitle}" not found`}</p>}
+      {
+        {
+          404: <p className="text-red-500"
+            children={`Source node "${sourceNodeTitle}" not found`} />,
+          409: <p className="text-red-500"
+            children={`Inlink from "${sourceNodeTitle}" already exists`} />,
+          500: <p className="text-red-500"
+            children="Internal server error" />
+        }[errorFlag]
+      }
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Source Node" required="required"
           value={sourceNodeTitle} onChange={handleChange} />
@@ -75,10 +81,16 @@ export function OutlinkForm({ reload, addLink }) {
 
   return (
     <div className="card">
-      {errorFlag === 409 && <p className="text-red-500">
-        {`Outlink to "${targetNodeTitle}" already exists`}</p>}
-      {errorFlag === 404 && <p className="text-red-500">
-        {`Target node "${targetNodeTitle}" not found`}</p>}
+      {
+        {
+          404: <p className="text-red-500"
+            children={`Target node "${targetNodeTitle}" not found`} />,
+          409: <p className="text-red-500"
+            children={`Outlink to "${targetNodeTitle}" already exists`} />,
+          500: <p className="text-red-500"
+            children="Internal server error" />
+        }[errorFlag]
+      }
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Target Node" required="required"
           value={targetNodeTitle} onChange={handleChange} />
@@ -114,10 +126,16 @@ export function ResourceForm({ reload }) {
   return (
     <div className="card">
       <h4>Add resource</h4>
-      {errorFlag === 409 && <p className="text-red-500">
-        Resource already exists</p>}
-      {errorFlag === 404 && <p className="text-red-500">
-        Node no longer exists, try reloading the page</p>}
+      {
+        {
+          404: <p className="text-red-500"
+            children={`Node no longer exists, try reloading the page`} />,
+          409: <p className="text-red-500"
+            children={`Resource already exists`} />,
+          500: <p className="text-red-500"
+            children="Internal server error" />
+        }[errorFlag]
+      }
       <form onSubmit={handleSubmit}>
         <input className="card" placeholder="Title" required="required"
           type={"url"} value={stagedResourceUrl} onChange={handleChange} />

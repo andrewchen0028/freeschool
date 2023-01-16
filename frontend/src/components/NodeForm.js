@@ -4,14 +4,14 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import url from "..";
 
 export default function NodeForm() {
-  const [stagedTitle, stageTitle] = useState("");
+  const [title, setTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState();
 
   const [addNode] = useOutletContext();
   const navigate = useNavigate();
 
   function handleChange(event) {
-    stageTitle(event.target.value);
+    setTitle(event.target.value);
     setErrorFlag();
   }
 
@@ -19,7 +19,7 @@ export default function NodeForm() {
     event.preventDefault();
 
     axios.post(`${url}/node`, {
-      title: stagedTitle
+      title: title
     }).then((response) => {
       let node = response.data;
       addNode({ id: node.id, title: node.title });
@@ -46,10 +46,17 @@ export default function NodeForm() {
         bg-neutral-800 bg-opacity-80">
       <div className="card bg-white"
         onClick={(event) => { event.stopPropagation(); }}>
-        {errorFlag}
+        {
+          {
+            409: <p className="text-red-500"
+              children={`Node "${title}" already exists`} />,
+            500: <p className="text-red-500"
+              children="Internal server error" />
+          }[errorFlag]
+        }
         <form onSubmit={handleSubmit}>
           <input className="card" placeholder="Node Title" required="required"
-            value={stagedTitle} onChange={handleChange} />
+            value={title} onChange={handleChange} />
           <button className="button" type="submit">Submit</button>
         </form>
       </div>
