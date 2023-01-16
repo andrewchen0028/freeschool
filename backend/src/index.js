@@ -11,6 +11,15 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// TODO-current:
+//  implement user authentication
+//  https://fullstackopen.com/en/part4/user_administration#creating-users
+const usersRouter = require("./controllers/users.js");
+app.use("/users", usersRouter);
+
+// TODO-medium:
+//  organize "app.get/post/delete()" calls into routers, as shown above
+
 // Called upon opening the graph from the homepage. Will eventually need to
 // filter item visibility by score somehow - maybe this should be done by
 // the client to avoid round-trip delay when using the score filter slider?
