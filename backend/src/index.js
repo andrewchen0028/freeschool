@@ -16,6 +16,7 @@ app.use(cors());
 //  https://fullstackopen.com/en/part4/user_administration#creating-users
 const usersRouter = require("./controllers/users.js");
 const loginRouter = require("./controllers/login.js");
+const { user } = require("./prisma");
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
 
@@ -212,6 +213,7 @@ app.delete("/", async function resetDatabase(_, response) {
   await Link.deleteMany();
   await Resource.deleteMany();
   await Node.deleteMany();
+  await prisma.user.deleteMany();
 
   await Node.createMany({
     data: [
@@ -230,6 +232,9 @@ app.delete("/", async function resetDatabase(_, response) {
       { nodeId: 1, url: "https://www.cia.gov" },
     ]
   });
+
+  // username joe, password mama
+  await prisma.user.create({ data: { username: "joe", passwordHash: "$2b$10$zmtkFvfj25ANZ9wZjQYcXeWjhTUZk1LgHyZ9a2nRzyvFYjVd2g4AK" }});
 
   return response.status(200).end();
 }
