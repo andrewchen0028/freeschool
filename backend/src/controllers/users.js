@@ -8,6 +8,7 @@ usersRouter.get("/", (_, response) => {
   });
 });
 
+// Called upon creating a new account
 usersRouter.post('/', async (request, response) => {
   const { username, password } = request.body;
 

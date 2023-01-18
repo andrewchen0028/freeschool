@@ -21,8 +21,11 @@ export default function TopBar({ resetGraph }) {
         <input id="range" type="range" min={-100} max={100} onChange={changeMinNodeScore} className="w-full bg-gray" />
       </div>
       <button className="button z-10"
-        onClick={() => { navigate(`createUser`); }}
-        children="Create User" />
+        onClick={() => { navigate(`logIn`); }}
+        children="Log in" />
+      <button className="button z-10"
+        onClick={() => { navigate(`createAccount`); }}
+        children="Create Account" />
     </div>
   );
 }

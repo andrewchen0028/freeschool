@@ -15,7 +15,9 @@ app.use(cors());
 //  implement user authentication
 //  https://fullstackopen.com/en/part4/user_administration#creating-users
 const usersRouter = require("./controllers/users.js");
+const loginRouter = require("./controllers/login.js");
 app.use("/users", usersRouter);
+app.use("/login", loginRouter);
 
 // TODO-medium:
 //  organize "app.get/post/delete()" calls into routers, as shown above
