@@ -4,7 +4,11 @@ const GraphContext = createContext();
 
 const GraphContextProvider = ({ children }) => {
     // -1 means we're at the base level graph. Anything else indicates the id of the node whose graph we're visiting.
-    const [currentGraph, setCurrentGraph] = useState(-1);
+    const baseGraph = {
+        id: -1,
+        title: ""
+    };
+    const [currentGraph, setCurrentGraph] = useState(baseGraph);
 
     return (
         <GraphContext.Provider value={[currentGraph, setCurrentGraph]}>
@@ -16,7 +20,7 @@ const GraphContextProvider = ({ children }) => {
 
 // context consumer hook
 const useGraphContext = () => {
-    // get the context
+    // get the context - this returns [currentGraph, setCurrentGraph]
     const context = useContext(GraphContext);
 
     // if `undefined`, throw an error

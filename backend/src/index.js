@@ -7,6 +7,7 @@ const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
+const Sublink = prisma.sublink;
 
 const app = express();
 app.use(express.json());
@@ -227,6 +228,7 @@ app.get("/:userId/username", async function getUsername(request, response) {
 app.delete("/", async function resetDatabase(_, response) {
   // Had to change order to keep referential integrity - would be better if we could set "cascade: true" here
   await Link.deleteMany();
+  await Sublink.deleteMany();
   await Resource.deleteMany();
   await Node.deleteMany();
   await prisma.user.deleteMany();
@@ -235,10 +237,26 @@ app.delete("/", async function resetDatabase(_, response) {
     data: [
       { id: 0, title: "Calculus 1" },
       { id: 1, title: "Calculus 2" },
+      { id: 2, title: "Continuity" },
+      { id: 3, title: "Limits" },
+      { id: 4, title: "Derivatives" },
     ]
   });
 
-  await Link.create({ data: { id: 0, source: 0, target: 1 } });
+  await Link.createMany({ 
+    data: [
+      { id: 0, source: 0, target: 1 },
+      { id: 2, source: 3, target: 4 },      
+      { id: 1, source: 2, target: 3 },
+  ]});
+
+  await Sublink.createMany({
+    data: [
+      { id: 0, superId: 0, subId: 2 },
+      { id: 1, superId: 0, subId: 3 },
+      { id: 2, superId: 0, subId: 4 }
+    ]
+  });
 
   await Resource.createMany({
     data: [

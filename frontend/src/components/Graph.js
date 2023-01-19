@@ -14,6 +14,7 @@ import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
 
 import { useUserContext } from "./UserContext";
+import { GraphContextProvider, useGraphContext } from "./GraphContext";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
@@ -25,11 +26,16 @@ export default function Graph() {
   /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
   const graphRef = useRef();
   const navigate = useNavigate();
+
   const setUserContext = useUserContext()[1];
+  // currentGraph stores id and title
+  const currentGraph = useGraphContext()[0];
+  const setCurrentGraph = useGraphContext()[1];
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
     setUserContext(-1);
+    setCurrentGraph({id: -1, title: 'base'});
     axios.delete(`${url}/`).then(() => {
       axios.get(`${url}/`).then((response) => {
         setNodes(response.data.nodes);
@@ -61,7 +67,6 @@ export default function Graph() {
       ctx.arc(node.x, node.y, radius, 0, Math.PI * 2, false);
       ctx.fill();
     }
-
     graphRef.current
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
@@ -86,7 +91,13 @@ export default function Graph() {
       })
       .onNodeHover((node) => { setHover(node); })
       .onNodeClick((node) => {
-        navigate(`${node.id}/${node.title}`);
+        navigate(`/${node.id}/${node.title}/node`);
+      }).onNodeRightClick((node) => {
+        setCurrentGraph({
+          id: node.id,
+          title: node.title,
+        });
+        navigate(`/${node.id}/${node.title}`);
       });
   }, [graphRef, hover, navigate]);
 

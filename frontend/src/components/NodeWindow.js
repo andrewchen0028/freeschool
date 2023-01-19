@@ -51,7 +51,7 @@ function ItemListSelectors() {
 
   const navigate = useNavigate();
 
-  useEffect(() => { navigate(itemType); }, [itemType, navigate]);
+  useEffect(() => { navigate(`${itemType}`); }, [itemType, navigate]);
 
   return (
     <div className="card flex gap-2">

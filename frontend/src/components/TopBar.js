@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
+import { useGraphContext } from './GraphContext';
 import axios from 'axios';
 
 import url from "..";
@@ -8,7 +9,9 @@ import url from "..";
 export default function TopBar({ resetGraph }) {
   const navigate = useNavigate();
   const [minNodeScore, setMinNodeScore] = useState(30);
+  
   const currentUserId = useUserContext()[0]; // useUserContext returns [user, setUser]
+  const currentGraph = useGraphContext()[0];
 
   const changeMinNodeScore = (e) => {
     setMinNodeScore(e.target.value);
@@ -35,11 +38,10 @@ export default function TopBar({ resetGraph }) {
 
   function LoggedInText() {
     const [loggedInText, setLoggedInText] = useState("");
-
     useEffect(() => {
       async function getUsername() {
         if (currentUserId === -1) {
-          setLoggedInText("Not logged in.");
+          setLoggedInText("Not logged in");
         } else if (currentUserId >= 0) {
           axios.get(`${url}/${currentUserId}/username/`).then((response) => {
             setLoggedInText("Logged in as ".concat(response.data.username));
@@ -57,23 +59,38 @@ export default function TopBar({ resetGraph }) {
     );
   }
 
+  function CurrentGraphText() {
+    let graphTitle = "base";
+    if (currentGraph.id !== -1) {
+      graphTitle = currentGraph.title;
+    }
+    return (
+      <div className="text-sm z-10 px-2 my-auto">
+        Currently viewing {graphTitle} graph
+      </div>
+    )
+  }
+
   return (
     <div className="absolute top-0 left-0 h-16 w-screen
-      flex flex-col content-start">
-      <div className="h-100%
+    flex flex-row justify-between align-center">
+      <div className="h-100% flex flex-col items-start">
+        <div className="h-100%
       flex flex-row items-center">
-        <button className="button z-10"
-          onClick={resetGraph}>RESET</button>
-        <div className="z-10 w-44">
-          <label htmlFor="range" className="text-sm">Minimum node score: {minNodeScore}</label>
-          <input id="range" type="range" min={-100} max={100} onChange={changeMinNodeScore} className="w-full bg-gray" />
+          <button className="button z-10"
+            onClick={resetGraph}>RESET</button>
+          <div className="z-10 w-44">
+            <label htmlFor="range" className="text-sm">Minimum node score: {minNodeScore}</label>
+            <input id="range" type="range" min={-100} max={100} onChange={changeMinNodeScore} className="w-full bg-gray" />
+          </div>
+          <LoginLogoutButton />
+          <button className="button z-10"
+            onClick={() => { navigate(`createAccount`); }}
+            children="Create Account" />
         </div>
-        <LoginLogoutButton />
-        <button className="button z-10"
-          onClick={() => { navigate(`createAccount`); }}
-          children="Create Account" />
+        <LoggedInText />
       </div>
-      <LoggedInText />
+      <CurrentGraphText/>
     </div>
   );
 }

@@ -12,24 +12,29 @@ import CreateAccount from './components/CreateAccount';
 import LogIn from './components/LogIn';
 
 import { UserContext, UserContextProvider } from './components/UserContext';
+import { GraphContextProvider } from './components/GraphContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserContextProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Graph />}>
-          <Route path="createNode" element={<NodeForm />} />
-          <Route path="createAccount" element={<CreateAccount />} />
-          <Route path="logIn" element={<LogIn />} />
-          <Route path=":nodeId/:nodeTitle" element={<NodeWindow />}>
-            <Route path="resources" element={<ResourceList />} />
-            <Route path="inlinks" element={<InlinkList />} />
-            <Route path="outlinks" element={<OutlinkList />} />
+    <GraphContextProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Graph />}>
+            <Route path="createNode" element={<NodeForm />} />
+            <Route path="createAccount" element={<CreateAccount />} />
+            <Route path="logIn" element={<LogIn />} />
+            <Route path=":nodeId/:nodeTitle" element={<Graph />}>
+              <Route path="node" element={<NodeWindow />}>
+                <Route path="resources" element={<ResourceList />} />
+                <Route path="inlinks" element={<InlinkList />} />
+                <Route path="outlinks" element={<OutlinkList />} />
+              </Route>
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </GraphContextProvider>
   </UserContextProvider>
 );
 
