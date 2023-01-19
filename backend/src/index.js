@@ -6,6 +6,7 @@ const { PrismaClientKnownRequestError } = require("@prisma/client/runtime");
 const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
+const User = prisma.user;
 
 const app = express();
 app.use(express.json());
@@ -205,6 +206,21 @@ app.post("/:nodeId/outlink", async function postOutlink(request, response) {
       console.warn(error);
       return response.status(500).end();
     });
+});
+
+// Return the user object given a user id
+app.get("/:userId/username", async function getUsername(request, response) {
+  let userIdInt = parseInt(request.params.userId);
+  let user = await User.findUnique({
+    where: {
+      id: userIdInt
+    }
+  }).catch((error) => console.warn(error));
+  if (user == null) {
+    throw("Didn't find a user with userId ", userIdInt);
+  } else {
+    return response.json(user).status(200).end();
+  }
 });
 
 // DEBUG ONLY

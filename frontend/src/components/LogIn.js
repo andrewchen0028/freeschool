@@ -4,12 +4,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import url from "..";
 
+import { useUserContext } from "./UserContext";
+
 export default function LogIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
 
   const navigate = useNavigate();
+
+  // Sets current user id
+  const setUserContext = useUserContext()[1];
 
   function handleUsernameChange(event) {
     setUsername(event.target.value);
@@ -23,12 +28,13 @@ export default function LogIn() {
 
   function handleSubmit(event) {
     event.preventDefault();
-
     axios.post(`${url}/login/`, {
       username: username,
       password: password
     }).then((response) => {
-      console.log(response.data);
+      if (response.status === 200) {
+        setUserContext(response.data.id);
+      }
     }).catch((error) => {
       console.log(error);
       setErrorFlag(error.response.status);

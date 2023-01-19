@@ -3,6 +3,7 @@ import ForceGraph from "force-graph";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { createContext } from "react";
 
 // eslint-disable-next-line no-unused-vars
 import { ForceGraphInstance } from "force-graph";
@@ -11,6 +12,8 @@ import url from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
+
+import { useUserContext } from "./UserContext";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
@@ -22,9 +25,11 @@ export default function Graph() {
   /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
   const graphRef = useRef();
   const navigate = useNavigate();
+  const setUserContext = useUserContext()[1];
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
+    setUserContext(-1);
     axios.delete(`${url}/`).then(() => {
       axios.get(`${url}/`).then((response) => {
         setNodes(response.data.nodes);
