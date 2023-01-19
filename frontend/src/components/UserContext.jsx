@@ -17,13 +17,13 @@ const UserContextProvider = ({ children }) => {
 const useUserContext = () => {
     // get the context
     const context = useContext(UserContext);
-  
+
     // if `undefined`, throw an error
     if (context === undefined) {
-      console.error("useUserContext was used outside of its Provider");
+        console.error("useUserContext was used outside of its Provider");
     }
-  
+
     return context;
-  };
+};
 
 export { UserContext, UserContextProvider, useUserContext };
