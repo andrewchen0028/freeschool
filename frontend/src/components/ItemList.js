@@ -2,7 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import url from "..";
-import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
+import { Card } from "./Cards";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 
 // Use ItemList by defining a <Form /> and a <Card /> component, then setting
@@ -30,7 +30,7 @@ function ItemList({ Form, Card, ext }) {
           // TODO-medium: Give each DB model an "id" field. Then, replace "index"
           // with "item.id".`
           ? response.data.map((item, index) => {
-            return (<Card item={item} key={index} />);
+            return (<Card item={item} type={ext} key={index} />);
           }) : <div className="card">None</div>);
       });
     }
@@ -47,13 +47,13 @@ function ItemList({ Form, Card, ext }) {
 }
 
 export function InlinkList() {
-  return <ItemList Form={InlinkForm} Card={InlinkCard} ext="inlinks" />;
+  return <ItemList Form={InlinkForm} Card={Card} ext="inlinks" />;
 }
 
 export function OutlinkList() {
-  return <ItemList Form={OutlinkForm} Card={OutlinkCard} ext="outlinks" />;
+  return <ItemList Form={OutlinkForm} Card={Card} ext="outlinks" />;
 }
 
 export function ResourceList() {
-  return <ItemList Form={ResourceForm} Card={ResourceCard} ext="resources" />;
+  return <ItemList Form={ResourceForm} Card={Card} ext="resources" />;
 }

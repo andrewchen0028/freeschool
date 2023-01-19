@@ -1,32 +1,36 @@
 import { Link } from "react-router-dom";
 
-export function InlinkCard({ item: inlink }) {
+export function Card({ item, type }) {
+  let LinkComponent = (<></>);
+  switch (type) {
+    case "inlinks":
+      LinkComponent = (
+        <>
+          from <Link to={`../../${item.source}/${item.sourceNode.title}`}
+            className="text-blue-600 underline">
+            {item.sourceNode.title}
+          </Link>
+        </>
+      ); break;
+    case "outlinks":
+      LinkComponent = (
+        <>
+          to <Link to={`../../${item.target}/${item.targetNode.title}`}
+            className="text-blue-600 underline">
+            {item.targetNode.title}
+          </Link>
+        </>
+      ); break;
+    case "resources":
+      LinkComponent = (
+        <a target="_blank" rel="noopener noreferrer" href={item.url}
+          className="text-blue-600 underline">{item.url}</a>
+      ); break;
+    default: break;
+  }
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.source}/${inlink.sourceNode.title}`}
-        className="text-blue-600 underline">
-        {inlink.sourceNode.title}
-      </Link>
+      {LinkComponent}
     </div>
-  );
-}
-
-export function OutlinkCard({ item: outlink }) {
-  return (
-    <div className="card z-10">
-      to <Link to={`../../${outlink.target}/${outlink.targetNode.title}`}
-        className="text-blue-600 underline">
-        {outlink.targetNode.title}
-      </Link>
-    </div>
-  );
-}
-
-export function ResourceCard({ item: resource }) {
-  return (
-    <div className="card z-10">
-      <a target="_blank" rel="noopener noreferrer" href={resource.url}
-        className="text-blue-600 underline">{resource.url}</a>
-    </div>
-  );
+  )
 }
