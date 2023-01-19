@@ -33,7 +33,7 @@ export function Card({ item, type }) {
   }
 
   let CommentInput = showCommentInput ? 
-  (<>
+  (<> 
     <form className="card m-2">
       <label className="block w-full">
         Comment:
@@ -52,7 +52,7 @@ export function Card({ item, type }) {
         <div className="flex flex-row items-center">
           <div className="flex flex-col items-center">
             <button className="upvote" onClick={() => { }}>+</button>
-            <h4>420</h4>
+            <h4>0</h4>
             <button className="downvote" onClick={() => { }}>—</button>
           </div>
           <div className="px-4">
