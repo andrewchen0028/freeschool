@@ -33,6 +33,8 @@ model Sublink {
   subNode   Node @relation("subNodeIdToNode", fields: [subId], references: [id])
   superId   Int
   subId     Int
+
+  @@map("sublinks")
 }
 
 model Node {

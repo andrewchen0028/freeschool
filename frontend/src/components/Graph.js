@@ -34,6 +34,7 @@ export default function Graph() {
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
+    navigate('/');
     setUserContext(-1);
     setCurrentGraph({id: -1, title: 'base'});
     axios.delete(`${url}/`).then(() => {
@@ -49,11 +50,21 @@ export default function Graph() {
 
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()(document.getElementById("graph"));
-    axios.get(`${url}/`).then((response) => {
-      setNodes(response.data.nodes);
-      setLinks(response.data.links);
-    });
-  }, []);
+    if (currentGraph.id === -1) {
+      axios.get(`${url}/`).then((response) => {
+        setNodes(response.data.nodes);
+        setLinks(response.data.links);
+      });
+    }
+    else if (currentGraph.id >= 0) {
+      axios.get(`${url}/${currentGraph.id}/subgraph`).then((response) => {
+        setNodes(response.data.nodes);
+        setLinks(response.data.links);
+      })
+    } else {
+      console.error("Error: currentGraph.id is not -1 nor >= 0 in Graph.js useEffect");
+    }
+  }, [currentGraph]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.

@@ -29,17 +29,65 @@ app.use("/login", loginRouter);
 // filter item visibility by score somehow - maybe this should be done by
 // the client to avoid round-trip delay when using the score filter slider?
 // (Also to avoid increasing server load with number of clients)
-app.get("/", function getGraph(_, response) {
-  Promise.all([
-    Node.findMany(),
-    Link.findMany()
-  ]).then(([nodes, links]) => {
-    return response.json({ nodes, links }).status(200).end();
+
+// Only returns elements which are not subnodes of other elements and links which connect those elements
+app.get("/", async function getBaseGraph(_, response) {
+  Node.findMany({
+    where: {
+      subNodeIdToNode: {
+        none: {},
+      },
+    },
+  }).then((nodes) => {
+    nodeIds = nodes.map((node) => { return node.id });
+    console.log(nodeIds);
+    Link.findMany({
+      where: {
+        OR: [
+          { source: { in: nodeIds } },
+          { target: { in: nodeIds } },
+        ]
+      }
+    }).then((links) => {
+      return response.json({ nodes, links }).status(200).end();
+    }).catch((error) => {
+      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
+      return response.status(500).end();
+    })
   }).catch((error) => {
-    console.warn(`Failed to get graph: ${error}`);
+    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
     return response.status(500).end();
   });
 });
+
+app.get("/:nodeId/subgraph", function getSubgraph(request, response) {
+  Node.findMany({
+    where: {
+      subNodeIdToNode: {
+        some: { superId: parseInt(request.params.nodeId) },
+      },
+    },
+  }).then((nodes) => {
+    nodeIds = nodes.map((node) => { return node.id });
+    console.log(nodeIds);
+    Link.findMany({
+      where: {
+        OR: [
+          { source: { in: nodeIds } },
+          { target: { in: nodeIds } },
+        ]
+      }
+    }).then((links) => {
+      return response.json({ nodes, links }).status(200).end();
+    }).catch((error) => {
+      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
+      return response.status(500).end();
+    })
+  }).catch((error) => {
+    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
+    return response.status(500).end();
+  });
+})
 
 // Called upon opening a NodeWindow. Returns node metadata.
 // (request.params.nodeId is of type string here, but needs to be int for db)
@@ -218,7 +266,7 @@ app.get("/:userId/username", async function getUsername(request, response) {
     }
   }).catch((error) => console.warn(error));
   if (user == null) {
-    throw("Didn't find a user with userId ", userIdInt);
+    throw ("Didn't find a user with userId ", userIdInt);
   } else {
     return response.json(user).status(200).end();
   }
@@ -243,12 +291,13 @@ app.delete("/", async function resetDatabase(_, response) {
     ]
   });
 
-  await Link.createMany({ 
+  await Link.createMany({
     data: [
       { id: 0, source: 0, target: 1 },
-      { id: 2, source: 3, target: 4 },      
+      { id: 2, source: 3, target: 4 },
       { id: 1, source: 2, target: 3 },
-  ]});
+    ]
+  });
 
   await Sublink.createMany({
     data: [
@@ -268,7 +317,7 @@ app.delete("/", async function resetDatabase(_, response) {
   });
 
   // username joe, password mama
-  await prisma.user.create({ data: { username: "joe", passwordHash: "$2b$10$zmtkFvfj25ANZ9wZjQYcXeWjhTUZk1LgHyZ9a2nRzyvFYjVd2g4AK" }});
+  await prisma.user.create({ data: { username: "joe", passwordHash: "$2b$10$zmtkFvfj25ANZ9wZjQYcXeWjhTUZk1LgHyZ9a2nRzyvFYjVd2g4AK" } });
 
   return response.status(200).end();
 }

@@ -65,7 +65,7 @@ export default function TopBar({ resetGraph }) {
       graphTitle = currentGraph.title;
     }
     return (
-      <div className="text-sm z-10 px-2 my-auto">
+      <div className="text-sm z-10 px-4 my-auto">
         Currently viewing {graphTitle} graph
       </div>
     )
