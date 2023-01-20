@@ -40,7 +40,6 @@ app.get("/", async function getBaseGraph(_, response) {
     },
   }).then((nodes) => {
     nodeIds = nodes.map((node) => { return node.id });
-    console.log(nodeIds);
     Link.findMany({
       where: {
         OR: [
@@ -69,7 +68,6 @@ app.get("/:nodeId/subgraph", function getSubgraph(request, response) {
     },
   }).then((nodes) => {
     nodeIds = nodes.map((node) => { return node.id });
-    console.log(nodeIds);
     Link.findMany({
       where: {
         OR: [

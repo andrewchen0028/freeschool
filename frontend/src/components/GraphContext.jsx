@@ -3,15 +3,11 @@ import React, { useContext, createContext, useState } from 'react';
 const GraphContext = createContext();
 
 const GraphContextProvider = ({ children }) => {
-    // -1 means we're at the base level graph. Anything else indicates the id of the node whose graph we're visiting.
-    const baseGraph = {
-        id: -1,
-        title: ""
-    };
-    const [currentGraph, setCurrentGraph] = useState(baseGraph);
+    // graphHistory stores the graphs we've visited
+    const [graphHistory, setGraphHistory] = useState([]);
 
     return (
-        <GraphContext.Provider value={[currentGraph, setCurrentGraph]}>
+        <GraphContext.Provider value={[graphHistory, setGraphHistory]}>
             {children}
         </GraphContext.Provider>
     );

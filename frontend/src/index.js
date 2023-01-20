@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Graph from './components/Graph';
 import NodeWindow from './components/NodeWindow';
 
@@ -20,16 +20,12 @@ root.render(
     <GraphContextProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Graph />}>
+          <Route path="/" element={<Navigate to="/subgraph/-1/base"/>}/>
+          <Route path="/subgraph/:superNodeId/:superNodeTitle" element={<Graph />}>
             <Route path="createNode" element={<NodeForm />} />
             <Route path="createAccount" element={<CreateAccount />} />
             <Route path="logIn" element={<LogIn />} />
-            <Route path=":nodeId/:nodeTitle" element={<Graph />}>
-              <Route path="node" element={<NodeWindow />}>
-                <Route path="resources" element={<ResourceList />} />
-                <Route path="inlinks" element={<InlinkList />} />
-                <Route path="outlinks" element={<OutlinkList />} />
-              </Route>
+            <Route path="node/:nodeId/:nodeTitle" element={<NodeWindow />}>
             </Route>
           </Route>
         </Routes>

@@ -1,9 +1,8 @@
 import axios from "axios";
 import ForceGraph from "force-graph";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { createContext } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Outlet, useParams, useNavigate, useLocation } from "react-router-dom";
 
 // eslint-disable-next-line no-unused-vars
 import { ForceGraphInstance } from "force-graph";
@@ -14,7 +13,7 @@ import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
 
 import { useUserContext } from "./UserContext";
-import { GraphContextProvider, useGraphContext } from "./GraphContext";
+import { useGraphContext } from "./GraphContext";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
@@ -28,15 +27,12 @@ export default function Graph() {
   const navigate = useNavigate();
 
   const setUserContext = useUserContext()[1];
-  // currentGraph stores id and title
-  const currentGraph = useGraphContext()[0];
-  const setCurrentGraph = useGraphContext()[1];
+  const params = useParams();
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
     navigate('/');
     setUserContext(-1);
-    setCurrentGraph({id: -1, title: 'base'});
     axios.delete(`${url}/`).then(() => {
       axios.get(`${url}/`).then((response) => {
         setNodes(response.data.nodes);
@@ -45,26 +41,45 @@ export default function Graph() {
     });
   }, []);
 
+  const location = useLocation();
+  // If the user changes the currently-viewed graph so that the GraphContext doesn't match the supernode listed in the url, the user must've hit the back button while viewing a subgraph.
+  // TODO: Find a less janky solution to this. (How to update GraphContext when user hits back button while viewing subgraph?)
+  // This checks that the new url is a subgraph url, and not a nodeWindow url
+  // useEffect(() => {
+  //   if (location.pathname.endsWith('resources') || location.pathname.endsWith('inlinks') || location.pathname.endsWith('outlinks')) {
+  //     if (!params.nodeId) {
+
+  //     }
+  //     if (params.nodeId === -1) {
+  //       if (currentGraph.id !== -1) setCurrentGraph({id: -1, title: ''});
+  //     } else {
+  //       axios.get(`${url}/${nodeId}`).then((response) => {
+  //         if (currentGraph !== response) setCurrentGraph(response.data);
+  //       })
+  //     }
+  //   } else {
+
+  //   }
+  // }, [location]);
+
   function addNode(node) { setNodes([...nodes, node]); }
   function addLink(link) { setLinks([...links, link]); }
 
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()(document.getElementById("graph"));
-    if (currentGraph.id === -1) {
-      axios.get(`${url}/`).then((response) => {
-        setNodes(response.data.nodes);
-        setLinks(response.data.links);
-      });
-    }
-    else if (currentGraph.id >= 0) {
-      axios.get(`${url}/${currentGraph.id}/subgraph`).then((response) => {
+    if (params.superNodeId !== "-1") {
+      axios.get(`${url}/${params.superNodeId}/subgraph`).then((response) => {
         setNodes(response.data.nodes);
         setLinks(response.data.links);
       })
     } else {
-      console.error("Error: currentGraph.id is not -1 nor >= 0 in Graph.js useEffect");
+      console.log("Fetching base");
+      axios.get(`${url}`).then((response) => {
+        setNodes(response.data.nodes);
+        setLinks(response.data.links);
+      })
     }
-  }, [currentGraph]);
+  }, [params]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
@@ -102,15 +117,20 @@ export default function Graph() {
       })
       .onNodeHover((node) => { setHover(node); })
       .onNodeClick((node) => {
-        navigate(`/${node.id}/${node.title}/node`);
+        console.log(Object.keys(params));
+        if (params.superNodeId === -1) {
+          navigate(`node/${node.id}/${node.title}`);
+        } else {
+          navigate(`/subgraph/${params.superNodeId}/${params.superNodeTitle}/node/${node.id}/${node.title}`);
+        }
       }).onNodeRightClick((node) => {
-        setCurrentGraph({
-          id: node.id,
-          title: node.title,
-        });
-        navigate(`/${node.id}/${node.title}`);
+        // setCurrentGraph({
+        //   id: node.id,
+        //   title: node.title,
+        // });
+        navigate(`/subgraph/${node.id}/${node.title}`);
       });
-  }, [graphRef, hover, navigate]);
+  }, [params, graphRef, hover, navigate]);
 
   useEffect(function redrawGraph() {
     if (graphRef.current) { graphRef.current.graphData({ nodes, links }); }

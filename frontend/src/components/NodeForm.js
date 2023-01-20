@@ -23,7 +23,7 @@ export default function NodeForm() {
     }).then((response) => {
       let node = response.data;
       addNode({ id: node.id, title: node.title });
-      navigate(`../${node.id}/${node.title}`);
+      navigate(`../node/${node.id}/${node.title}`);
     }).catch((error) => {
       setErrorFlag(error.response.status);
     });

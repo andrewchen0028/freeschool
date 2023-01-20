@@ -9,7 +9,7 @@ export function Card({ item, type }) {
     case "inlinks":
       LinkComponent = (
         <>
-          from <Link to={`../../${item.source}/${item.sourceNode.title}`}
+          from <Link to={`../../${item.source}/${item.sourceNode.title}/node`}
             className="text-blue-600 underline">
             {item.sourceNode.title}
           </Link>
@@ -18,7 +18,7 @@ export function Card({ item, type }) {
     case "outlinks":
       LinkComponent = (
         <>
-          to <Link to={`../../${item.target}/${item.targetNode.title}`}
+          to <Link to={`../../${item.target}/${item.targetNode.title}/node`}
             className="text-blue-600 underline">
             {item.targetNode.title}
           </Link>
