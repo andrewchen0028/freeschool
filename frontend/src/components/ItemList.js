@@ -13,7 +13,6 @@ import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 // ext: "resources", "inlinks", etc
 function ItemList({ Form, Card, ext }) {
   const [cards, setCards] = useState([]);
-
   const [addLink] = useOutletContext();
   const { nodeId } = useParams();
 

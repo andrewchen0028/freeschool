@@ -8,6 +8,7 @@ const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
 const Sublink = prisma.sublink;
+const ResourceComment = prisma.resourceComment;
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(cors());
 const usersRouter = require("./controllers/users.js");
 const loginRouter = require("./controllers/login.js");
 const { user } = require("./prisma");
+const { response } = require("express");
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
 
@@ -109,6 +111,19 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
     return response.json(resources).status(200).end();
   }).catch((error) => {
     console.warn(`Failed to get resources: ${error}`);
+    return response.status(500).end();
+  });
+});
+
+// Called upon selecting Resources within a NodeWindow - fetches the comments for a resource
+// TODO-high: Return comments in nested structure
+app.get("/:nodeId/:resourceId/comments", function getResourceComments(request, response) {
+  ResourceComment.findMany({
+    where: { resourceId: parseInt(request.params.resourceId) }
+  }).then((comments) => {
+    return response.json(comments).status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get resource comments: ${error}`);
     return response.status(500).end();
   });
 });
@@ -275,9 +290,10 @@ app.delete("/", async function resetDatabase(_, response) {
   // Had to change order to keep referential integrity - would be better if we could set "cascade: true" here
   await Link.deleteMany();
   await Sublink.deleteMany();
+  await ResourceComment.deleteMany();
   await Resource.deleteMany();
   await Node.deleteMany();
-  await prisma.user.deleteMany();
+  await User.deleteMany();
 
   await Node.createMany({
     data: [
@@ -307,10 +323,17 @@ app.delete("/", async function resetDatabase(_, response) {
 
   await Resource.createMany({
     data: [
-      { nodeId: 0, url: "https://www.fbi.gov" },
-      { nodeId: 0, url: "https://www.atf.gov" },
-      { nodeId: 1, url: "https://www.nsa.gov" },
-      { nodeId: 1, url: "https://www.cia.gov" },
+      { id: 0, nodeId: 0, url: "https://www.fbi.gov" },
+      { id: 1, nodeId: 0, url: "https://www.atf.gov" },
+      { id: 2, nodeId: 1, url: "https://www.nsa.gov" },
+      { id: 3, nodeId: 1, url: "https://www.cia.gov" },
+    ]
+  });
+
+  await ResourceComment.createMany({
+    data: [
+      { id: 0, text: "Why is this here?", resourceId: 0 },
+      { id: 1, text: "You didn't try to bribe the FBI agent, did you?", resourceId: 0, parentCommentId: 0 }
     ]
   });
 
