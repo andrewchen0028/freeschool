@@ -55,7 +55,6 @@ export default function TopBar({ resetGraph }) {
   const location = useLocation();
   useEffect(() => {
     // TODO: Find a less janky way of checking that we've changed subgraph and not just clicked into a NodeWindow (we know that when we click into node X's NodeWindow we can't be viewing X's subgraph)
-    console.log(location.pathname);
     if (!(location.pathname.endsWith('node') || location.pathname.endsWith('resources') || location.pathname.endsWith('inlinks') || location.pathname.endsWith('outlinks'))) {
       if (!params.superNodeTitle) {
         setGraphTitle('base');

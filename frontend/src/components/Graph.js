@@ -73,7 +73,6 @@ export default function Graph() {
         setLinks(response.data.links);
       })
     } else {
-      console.log("Fetching base");
       axios.get(`${url}`).then((response) => {
         setNodes(response.data.nodes);
         setLinks(response.data.links);

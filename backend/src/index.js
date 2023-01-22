@@ -116,7 +116,7 @@ app.get("/:nodeId/resources", function getNodeResources(request, response) {
 });
 
 // Called upon selecting Resources within a NodeWindow - fetches the comments for a resource
-// TODO-high: Return comments in nested structure
+// TODO-high: return a json where comment hierarchies are stored in childComments arrays
 app.get("/:nodeId/:resourceId/comments", function getResourceComments(request, response) {
   ResourceComment.findMany({
     where: { resourceId: parseInt(request.params.resourceId) }
@@ -332,8 +332,11 @@ app.delete("/", async function resetDatabase(_, response) {
 
   await ResourceComment.createMany({
     data: [
-      { id: 0, text: "Why is this here?", resourceId: 0 },
-      { id: 1, text: "You didn't try to bribe the FBI agent, did you?", resourceId: 0, parentCommentId: 0 }
+      { id: 0, text: "In that particular situation - one trade - north of half a million dollars.", resourceId: 0 },
+      { id: 1, text: "And I'd do that for anybody. \nAnybody, you know, that needs the proper guidance.", resourceId: 0, parentCommentId: 0 },
+      { id: 2, text: "Can you say that again? Just the way you said it. Just the same way.", resourceId: 0, parentCommentId: 1},
+      { id: 3, text: "You didn't try to bribe the FBI agent, did you?", resourceId: 0}
+      
     ]
   });
 

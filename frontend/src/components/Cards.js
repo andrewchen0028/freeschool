@@ -49,19 +49,60 @@ export function Card({ item, type }) {
     </>) :
     (<></>);
 
-  const [comments, setComments] = useState([]);
+  const [commentCards, setCommentCards] = useState([]);
 
   const loadComments = useCallback(() => {
     if (nodeId && type === "resources") {
       axios.get(`${url}/${nodeId}/${item.id}/comments`).then((response) => {
-        setComments(response.data.map((comment, index) => {
-          return (
-            <div className={`card my-0`}>
-              {comment.text}
+        // Map comment ids to comment data
+        const commentIds = new Map();
+        for (const comment of response.data) {
+          commentIds.set(comment.id, {
+            text: comment.text,
+            score: comment.score,
+          })
+        }
+        // Map comment ids to their children ids
+        const commentChildren = new Map();
+        for (const comment of response.data) {
+          // If comment.id is not in commentsWithChildren, add it
+          if (!commentChildren.has(comment.id)) { commentChildren.set(comment.id, []) };
+          // Push comment.id to commentsWithChildren[comment.parentCommentId]
+          const parentId = comment.parentCommentId;
+          if (parentId !== null) {
+            if (commentChildren.has(parentId)) {
+              commentChildren.set(parentId, (commentChildren.get(parentId)).concat([comment.id]));
+            } else {
+              commentChildren.set(parentId, [comment.id]);
+            }
+          }
+        }
+        // Generate cards
+        const newCommentCards = [];
+        // dfs function adds a card for current comment and all its children
+        const addedCommentIds = new Set();
+        function dfs(commentId, commentData, nestingLayer) {
+          if (addedCommentIds.has(commentId)) return;
+          addedCommentIds.add(commentId);
+          newCommentCards.push(
+            <div className="border-l-2 p-2 py-0.5 items-center" key={commentId} style={{ marginLeft: `${nestingLayer}em` }}>
+              {commentData.text}
+              <div className="flex pb-1 flex items-center gap-2">
+                <button className="downvote p-0" onClick={() => {  }}>-</button>
+                <h6>{commentIds.get(commentId).score}</h6>
+                <button className="upvote p-0" onClick={() => {  }}>+</button>
+              </div>
             </div>
           )
+          for (const childId of commentChildren.get(commentId)) {
+            dfs(childId, commentIds.get(childId), nestingLayer + 1);
+          }
         }
-        ));
+        // Run DFS on each comment - here, "comment" is a pair (key, value in commentIds Map)
+        for (const comment of commentIds) {
+          dfs(comment[0], comment[1], 0);
+        }
+        setCommentCards(newCommentCards);
       })
     }
   }, [nodeId, type, item.id]);
@@ -93,7 +134,7 @@ export function Card({ item, type }) {
       </div>
       <div className="card mt-0 border-t-0">
         Comments:
-        {comments}
+        {commentCards}
       </div>
     </>
   )
