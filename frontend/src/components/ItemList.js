@@ -2,7 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 import url from "..";
-import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
+import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards.tsx";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 
 // Use ItemList by defining a <Form /> and a <Card /> component, then setting
