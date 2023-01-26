@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1 { @apply text-4xl }
+  h2 { @apply text-3xl }
+  h3 { @apply text-2xl }
+  h4 { @apply text-xl }
+  h5 { @apply text-lg }
+  h6 { @apply text-base }
+  p { @apply text-sm }
+}
+
+@layer components {
+  .card { @apply m-2 p-2 border rounded }
+  .button { @apply card p-2 bg-white hover:bg-neutral-100 active:bg-neutral-200 }
+  .vote { @apply font-mono font-extrabold px-2
+    text-neutral-600 hover:bg-neutral-100 active:bg-neutral-200
+  }
+  .upvote { @apply vote hover:text-orange-600 active:text-orange-600 }
+  .downvote { @apply vote hover:text-indigo-400 active:text-indigo-400 }
+}

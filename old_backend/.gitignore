@@ -1,0 +1,7 @@
+# dependencies
+/node_modules
+
+# database credentials
+.env
+
+graveyard
