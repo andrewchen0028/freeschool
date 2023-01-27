@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           Int    @id @default(autoincrement())
+  username     String @unique
+  passwordHash String
+
+  @@map("users")
+}
+
 model Link {
   id         Int  @id @default(autoincrement())
   sourceNode Node @relation("sourceNodeIdToNode", fields: [source], references: [id])
@@ -18,11 +26,21 @@ model Link {
 }
 
 model Node {
-  id                 Int    @id @default(autoincrement())
-  score              Int    @default(0)
-  title              String @unique
-  sourceNodeIdToNode Link[] @relation("sourceNodeIdToNode")
-  targetNodeIdToNode Link[] @relation("targetNodeIdToNode")
+  id                 Int        @id @default(autoincrement())
+  score              Int        @default(0)
+  title              String     @unique
+  sourceNodeIdToNode Link[]     @relation("sourceNodeIdToNode")
+  targetNodeIdToNode Link[]     @relation("targetNodeIdToNode")
+  resources          Resource[]
 
   @@map("nodes")
+}
+
+model Resource {
+  id     Int    @id @default(autoincrement())
+  url    String @unique @db.VarChar(255)
+  node   Node   @relation(fields: [nodeId], references: [id])
+  nodeId Int
+
+  @@map("resources")
 }
