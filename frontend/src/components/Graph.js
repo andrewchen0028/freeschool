@@ -7,7 +7,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { ForceGraphInstance } from "force-graph";
 
-import url from "..";
+import { url } from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";

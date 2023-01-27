@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import url from "..";
+import { url } from "..";
 
 export function InlinkForm({ reload, addLink }) {
   const [sourceNodeTitle, setSourceNodeTitle] = useState("");

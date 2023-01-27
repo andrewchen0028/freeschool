@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import url from "..";
+import { url } from "..";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");

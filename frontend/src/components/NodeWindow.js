@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
-import url from "..";
+import { url } from "..";
 
 function NodeWindowSideBar() {
   const navigate = useNavigate();

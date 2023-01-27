@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
-import url from "..";
+import { url } from "..";
 import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";
 

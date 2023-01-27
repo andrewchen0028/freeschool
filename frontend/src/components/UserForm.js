@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
-import url from "..";
+import { url } from "..";
 
 export default function UserForm() {
   const [username, setUsername] = useState("");

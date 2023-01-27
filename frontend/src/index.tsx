@@ -28,5 +28,4 @@ root.render(
   </BrowserRouter>
 );
 
-const url = "http://localhost:3001";
-export default url;
+export const url = "http://localhost:3001";
