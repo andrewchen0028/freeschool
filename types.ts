@@ -9,4 +9,9 @@ export type Link = {
   id?: number;
 } & LinkObject
 
-export type AddNodeFunction = (node: Node) => void
+// Frontend-backend intermediary used for IOLink cards.
+export type IOLink = {
+  link: Link;
+  source?: Node;
+  target?: Node;
+}

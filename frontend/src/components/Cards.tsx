@@ -1,28 +1,31 @@
 import { Link } from "react-router-dom";
 
-export function InlinkCard({ item: inlink }) {
+import { IOLink } from "../../../types";
+
+export function InlinkCard({ item: inlink }: { item: IOLink }) {
+  console.log(inlink);
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.source}/${inlink.sourceNode.title}`}
+      from <Link to={`../../${inlink.source?.id}/${inlink.source?.title}`}
         className="text-blue-600 underline">
-        {inlink.sourceNode.title}
+        {inlink.source?.title}
       </Link>
     </div>
   );
 }
 
-export function OutlinkCard({ item: outlink }) {
+export function OutlinkCard({ item: outlink }: { item: IOLink }) {
   return (
     <div className="card z-10">
-      to <Link to={`../../${outlink.target}/${outlink.targetNode.title}`}
+      to <Link to={`../../${outlink.target?.id}/${outlink.target?.title}`}
         className="text-blue-600 underline">
-        {outlink.targetNode.title}
+        {outlink.target?.title}
       </Link>
     </div>
   );
 }
 
-export function ResourceCard({ item: resource }) {
+export function ResourceCard({ item: resource }: { item: any }) {
   return (
     <div className="card z-10">
       <a target="_blank" rel="noopener noreferrer" href={resource.url}

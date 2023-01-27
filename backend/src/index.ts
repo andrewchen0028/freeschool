@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt';
 import cors from "cors";
 import express from "express";
-import { PrismaClient } from '@prisma/client';
+import { Link, PrismaClient } from '@prisma/client';
+
+import { IOLink } from "../../types";
 
 const app = express();
 app.use(express.json());
@@ -47,36 +49,38 @@ app.get("/:nodeId/resources", function getNodeResources(req, res) {
   });
 });
 
-app.get("/:nodeId/inlinks", function getNodeInlinks(req, res) {
-  // Maps findMany() result [{inlink}] to [{sourceNode, ...inlink}] to expose
-  // sourceNode metadata to frontend
-  Link.findMany({
-    where: { target: parseInt(req.params.nodeId) }
-  }).then((inlinks) => {
-    Promise.all(inlinks.map((inlink) => (
-      Node.findUnique({ where: { id: inlink.source } })
-        .then((sourceNode) => ({ sourceNode, ...inlink }))
-    ))).then((inlinks) => { return res.json(inlinks).status(200).end(); });
-  }).catch((error) => {
+async function linkToIOLink(link: Link): Promise<IOLink> {
+  let sourceNode = await Node.findUnique({ where: { id: link.source } });
+  let targetNode = await Node.findUnique({ where: { id: link.target } });
+  if (sourceNode && targetNode)
+    return { link: link, source: sourceNode, target: targetNode }
+  else throw new Error(`Couldn't find source or target node`);
+}
+
+app.get("/:nodeId/inlinks", async function getInlinks(req, res) {
+  try {
+    let links = await Link.findMany({
+      where: { target: parseInt(req.params.nodeId) }
+    });
+    let ioLinks = await Promise.all(links.map((link) => (linkToIOLink(link))));
+    return res.json(ioLinks).status(200).end();
+  } catch (error) {
     console.warn(`Failed to get inlinks: ${error}`);
     return res.status(500).end();
-  });
+  }
 });
 
-app.get("/:nodeId/outlinks", function getNodeOutlinks(req, res) {
-  // Maps findMany() result [{outlink}] to [{targetNode, ...outlink}] to expose
-  // targetNode metadata to frontend
-  Link.findMany({
-    where: { source: parseInt(req.params.nodeId) }
-  }).then((outlinks) => {
-    Promise.all(outlinks.map((outlink) => (
-      Node.findUnique({ where: { id: outlink.target } })
-        .then((targetNode) => ({ targetNode, ...outlink }))
-    ))).then((outlinks) => { return res.json(outlinks).status(200).end(); });
-  }).catch((error) => {
-    console.warn(`Failed to get outlinks: ${error}`);
+app.get("/:nodeId/outlinks", async function getOutlinks(req, res) {
+  try {
+    let links = await Link.findMany({
+      where: { source: parseInt(req.params.nodeId) }
+    });
+    let ioLinks = await Promise.all(links.map((link) => (linkToIOLink(link))));
+    return res.json(ioLinks).status(200).end();
+  } catch (error) {
+    console.warn(`Failed to get inlinks: ${error}`);
     return res.status(500).end();
-  });
+  }
 });
 
 app.get("/user", (_, res) => {
