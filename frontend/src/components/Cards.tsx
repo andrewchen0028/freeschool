@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { IOLink } from "../../../types";
 
 export function InlinkCard({ item: inlink }: { item: IOLink }) {
-  console.log(inlink);
   return (
     <div className="card z-10">
       from <Link to={`../../${inlink.source?.id}/${inlink.source?.title}`}

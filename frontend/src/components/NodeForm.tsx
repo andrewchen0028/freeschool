@@ -7,7 +7,7 @@ import { Node } from "../../../types";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");
-  const [errorFlag, setErrorFlag] = useState<number>(0);
+  const [errorFlag, setErrorFlag] = useState(0);
 
   const [addNode] = useOutletContext<[(node: NodeObject) => void]>();
   const navigate = useNavigate();

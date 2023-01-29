@@ -1,19 +1,23 @@
 import axios from "axios";
-import { useState } from "react";
+import { LinkObject } from "force-graph";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import { url } from "..";
 
-export function InlinkForm({ reload, addLink }) {
+export function InlinkForm({ reload, addLink }: {
+  reload: () => void,
+  addLink: (link: LinkObject) => void
+}) {
   const [sourceNodeTitle, setSourceNodeTitle] = useState("");
-  const [errorFlag, setErrorFlag] = useState();
+  const [errorFlag, setErrorFlag] = useState(0);
   const { nodeId } = useParams();
 
-  function handleChange(event) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setSourceNodeTitle(event.target.value);
-    setErrorFlag();
+    setErrorFlag(0);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     axios.post(`${url}/${nodeId}/inlink`, {
@@ -44,7 +48,7 @@ export function InlinkForm({ reload, addLink }) {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Source Node" required="required"
+        <input className="card" placeholder="Source Node" required={true}
           value={sourceNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
@@ -52,17 +56,20 @@ export function InlinkForm({ reload, addLink }) {
   );
 }
 
-export function OutlinkForm({ reload, addLink }) {
+export function OutlinkForm({ reload, addLink }: {
+  reload: () => void,
+  addLink: (link: LinkObject) => void
+}) {
   const [targetNodeTitle, setTargetNodeTitle] = useState("");
-  const [errorFlag, setErrorFlag] = useState();
+  const [errorFlag, setErrorFlag] = useState(0);
   const { nodeId } = useParams();
 
-  function handleChange(event) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setTargetNodeTitle(event.target.value);
-    setErrorFlag();
+    setErrorFlag(0);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     axios.post(`${url}/${nodeId}/outlink`, {
@@ -92,7 +99,7 @@ export function OutlinkForm({ reload, addLink }) {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Target Node" required="required"
+        <input className="card" placeholder="Target Node" required={true}
           value={targetNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
@@ -100,17 +107,17 @@ export function OutlinkForm({ reload, addLink }) {
   );
 }
 
-export function ResourceForm({ reload }) {
+export function ResourceForm({ reload }: { reload: () => void }) {
   const [stagedResourceUrl, stageResourceUrl] = useState("");
-  const [errorFlag, setErrorFlag] = useState();
+  const [errorFlag, setErrorFlag] = useState(0);
   const { nodeId } = useParams();
 
-  function handleChange(event) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     stageResourceUrl(event.target.value);
-    setErrorFlag();
+    setErrorFlag(0);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     axios.post(`${url}/${nodeId}/resource`, {
@@ -137,7 +144,7 @@ export function ResourceForm({ reload }) {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Title" required="required"
+        <input className="card" placeholder="Title" required={true}
           type={"url"} value={stagedResourceUrl} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
