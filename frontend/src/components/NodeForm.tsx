@@ -1,28 +1,30 @@
 import axios from "axios";
-import { useState } from "react";
+import { NodeObject } from "force-graph";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { url } from "..";
+import { Node } from "../../../types";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");
-  const [errorFlag, setErrorFlag] = useState();
+  const [errorFlag, setErrorFlag] = useState<number>(0);
 
-  const [addNode] = useOutletContext();
+  const [addNode] = useOutletContext<[(node: NodeObject) => void]>();
   const navigate = useNavigate();
 
-  function handleChange(event) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setTitle(event.target.value);
-    setErrorFlag();
+    setErrorFlag(0);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     axios.post(`${url}/node`, {
       title: title
     }).then((response) => {
-      let node = response.data;
-      addNode({ id: node.id, title: node.title });
+      let node: Node = response.data;
+      addNode({ id: node.id, title: node.title } as NodeObject);
       navigate(`../${node.id}/${node.title}`);
     }).catch((error) => {
       setErrorFlag(error.response.status);
@@ -55,7 +57,7 @@ export default function NodeForm() {
           }[errorFlag]
         }
         <form onSubmit={handleSubmit}>
-          <input className="card" placeholder="Node Title" required="required"
+          <input className="card" placeholder="Node Title" required={true}
             value={title} onChange={handleChange} />
           <button className="button" type="submit">Submit</button>
         </form>
