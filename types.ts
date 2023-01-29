@@ -1,16 +1,16 @@
 import { LinkObject, NodeObject } from "force-graph"
 
-export type Node = {
+export interface Node extends NodeObject {
   title: string;
   __bckgRadius?: number;
-} & NodeObject
+}
 
-export type Link = {
+export interface Link extends LinkObject {
   id?: number;
-} & LinkObject
+}
 
 // Frontend-backend intermediary used for IOLink cards.
-export type IOLink = {
+export interface IOLink {
   link: Link;
   source?: Node;
   target?: Node;

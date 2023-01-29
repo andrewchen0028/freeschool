@@ -1,5 +1,5 @@
 import axios from "axios";
-import ForceGraph from "force-graph";
+import ForceGraph, { LinkObject, NodeObject } from "force-graph";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -11,16 +11,18 @@ import { url } from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
+import { Node } from "../../../types";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
-  const [nodes, setNodes] = useState([]);
-  const [links, setLinks] = useState([]);
-  const [hover, setHover] = useState();
+  // Hold force-graph NodeObject objects in state, even though they don't have
+  // the "title" and "__bckgRadius" properties: just cast NodeObjects using
+  // "as Node" before using those properties.
+  const [nodes, setNodes] = useState<NodeObject[]>([]);
+  const [links, setLinks] = useState<LinkObject[]>([]);
+  const [hover, setHover] = useState<NodeObject | null>();
 
-  // Typedef here so we get intellisense on `graphRef.current` elsewhere
-  /** @type {React.MutableRefObject<ForceGraphInstance | undefined>} */
-  const graphRef = useRef();
+  const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
 
   // DEBUG ONLY: Reset database
@@ -33,11 +35,12 @@ export default function Graph() {
     });
   }, []);
 
-  function addNode(node) { setNodes([...nodes, node]); }
-  function addLink(link) { setLinks([...links, link]); }
+  function addNode(node: NodeObject) { setNodes([...nodes, node]); }
+  function addLink(link: LinkObject) { setLinks([...links, link]); }
 
   useEffect(function initializeGraphRef() {
-    graphRef.current = ForceGraph()(document.getElementById("graph"));
+    graphRef.current = ForceGraph()
+      (document.getElementById("graph") as HTMLElement);
     axios.get(`${url}/`).then((response) => {
       setNodes(response.data.nodes);
       setLinks(response.data.links);
@@ -46,42 +49,41 @@ export default function Graph() {
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
-  // 
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
-    function paintRing(node, color, ctx, radius) {
+    function paintRing(node: NodeObject, color: string,
+      ctx: CanvasRenderingContext2D, radius: number) {
       ctx.beginPath();
       ctx.fillStyle = color;
-      ctx.arc(node.x, node.y, radius, 0, Math.PI * 2, false);
+      ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2, false);
       ctx.fill();
     }
 
-    graphRef.current
+    if (graphRef.current) graphRef.current
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200])
-      .nodePointerAreaPaint((node, color, ctx) => {
-        paintRing(node, color, ctx, node.__bckgRadius);
+      .nodePointerAreaPaint((nodeObject, color, ctx) => {
+        paintRing(nodeObject, color, ctx, (nodeObject as Node).__bckgRadius!);
       })
-      .nodeCanvasObject((node, ctx, globalScale) => {
-        const fontSize = graphRef.current.zoom() * 4 / globalScale;
-        const ringRadius = 2 + ctx.measureText(node.title).width / 2;
-        const ringColor = node === hover
-          ? colors.neutral[400]
-          : colors.neutral[300];
-        paintRing(node, ringColor, ctx, ringRadius + 0.4);
-        paintRing(node, colors.white, ctx, ringRadius);
+      .nodeCanvasObject((nodeObject, ctx, globalScale) => {
+        let node = nodeObject as Node;
+        const fontSize = graphRef.current!.zoom() * 4 / globalScale;
+        const bckgColor = colors.white;
+        const ringColor = colors.neutral[node === hover ? 400 : 300];
+        node.__bckgRadius = 2 + ctx.measureText(node.title).width / 2;
+        paintRing(node, ringColor, ctx, node.__bckgRadius + 0.4);
+        paintRing(node, bckgColor, ctx, node.__bckgRadius);
         ctx.font = `${fontSize}px Sans-Serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = colors.orange[600];
-        ctx.fillText(node.title, node.x, node.y);
-        node.__bckgRadius = ringRadius;
+        ctx.fillText(node.title, node.x!, node.y!);
       })
-      .onNodeHover((node) => { setHover(node); })
-      .onNodeClick((node) => {
-        navigate(`${node.id}/${node.title}`);
+      .onNodeHover((nodeObject) => { setHover(nodeObject); })
+      .onNodeClick((nodeObject) => {
+        navigate(`${nodeObject.id}/${(nodeObject as Node).title}`);
       });
   }, [graphRef, hover, navigate]);
 
