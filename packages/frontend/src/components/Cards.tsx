@@ -1,30 +1,30 @@
 import { Link } from "react-router-dom";
 
-import { IOLink } from "shared-data";
+import { Node, Resource } from "@prisma/client";
 
-export function InlinkCard({ item: inlink }: { item: IOLink }) {
+export function InlinkCard({ item: sourceNode }: { item: Node }) {
   return (
     <div className="card z-10">
-      from <Link to={`../../${inlink.source?.id}/${inlink.source?.title}`}
+      from <Link to={`../../${sourceNode.id}/${sourceNode.title}`}
         className="text-blue-600 underline">
-        {inlink.source?.title}
+        {sourceNode.title}
       </Link>
     </div>
   );
 }
 
-export function OutlinkCard({ item: outlink }: { item: IOLink }) {
+export function OutlinkCard({ item: targetNode }: { item: Node }) {
   return (
     <div className="card z-10">
-      to <Link to={`../../${outlink.target?.id}/${outlink.target?.title}`}
+      to <Link to={`../../${targetNode.id}/${targetNode.title}`}
         className="text-blue-600 underline">
-        {outlink.target?.title}
+        {targetNode.title}
       </Link>
     </div>
   );
 }
 
-export function ResourceCard({ item: resource }: { item: any }) {
+export function ResourceCard({ item: resource }: { item: Resource }) {
   return (
     <div className="card z-10">
       <a target="_blank" rel="noopener noreferrer" href={resource.url}

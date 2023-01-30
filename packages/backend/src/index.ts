@@ -1,9 +1,7 @@
 import bcrypt from 'bcrypt';
 import cors from "cors";
 import express from "express";
-import { Link, PrismaClient } from '@prisma/client';
-
-import { IOLink } from "shared-data";
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
 app.use(express.json());
@@ -49,38 +47,22 @@ app.get("/:nodeId/resources", function getNodeResources(req, res) {
   });
 });
 
-async function linkToIOLink(link: Link): Promise<IOLink> {
-  let sourceNode = await Node.findUnique({ where: { id: link.source } });
-  let targetNode = await Node.findUnique({ where: { id: link.target } });
-  if (sourceNode && targetNode)
-    return { link: link, source: sourceNode, target: targetNode }
-  else throw new Error(`Couldn't find source or target node`);
-}
-
-app.get("/:nodeId/inlinks", async function getInlinks(req, res) {
-  try {
-    let links = await Link.findMany({
-      where: { target: parseInt(req.params.nodeId) }
-    });
-    let ioLinks = await Promise.all(links.map((link) => (linkToIOLink(link))));
-    return res.json(ioLinks).status(200).end();
-  } catch (error) {
-    console.warn(`Failed to get inlinks: ${error}`);
-    return res.status(500).end();
-  }
+app.get("/:nodeId/inlinks", function getInlinks(req, res) {
+  Link.findMany({
+    where: { target: parseInt(req.params.nodeId) },
+    select: { sourceNode: true }
+  })
+    .then(sourceNodes => res.json(sourceNodes.map(({ sourceNode }) => sourceNode)).status(200).end())
+    .catch(error => res.status(500).send(error).end());
 });
 
-app.get("/:nodeId/outlinks", async function getOutlinks(req, res) {
-  try {
-    let links = await Link.findMany({
-      where: { source: parseInt(req.params.nodeId) }
-    });
-    let ioLinks = await Promise.all(links.map((link) => (linkToIOLink(link))));
-    return res.json(ioLinks).status(200).end();
-  } catch (error) {
-    console.warn(`Failed to get inlinks: ${error}`);
-    return res.status(500).end();
-  }
+app.get("/:nodeId/outlinks", function getOutlinks(req, res) {
+  Link.findMany({
+    where: { source: parseInt(req.params.nodeId) },
+    select: { targetNode: true }
+  })
+    .then(targetNodes => res.json(targetNodes.map(({ targetNode }) => targetNode)).status(200).end())
+    .catch(error => res.status(500).send(error).end());
 });
 
 app.get("/user", (_, res) => {

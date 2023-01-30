@@ -8,10 +8,3 @@ export interface Node extends NodeObject {
 export interface Link extends LinkObject {
   id?: number;
 }
-
-// Frontend-backend intermediary used for IOLink cards.
-export interface IOLink {
-  link: Link;
-  source?: Node;
-  target?: Node;
-}
