@@ -100,3 +100,6 @@ export default function Graph() {
     </div>
   );
 }
+
+export type addNodeFunction = (node: NodeObject) => void;
+export type addLinkFunction = (link: LinkObject) => void;

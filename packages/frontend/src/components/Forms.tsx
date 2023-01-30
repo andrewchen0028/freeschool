@@ -1,12 +1,12 @@
 import axios from "axios";
-import { LinkObject } from "force-graph";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import { url } from "..";
+import { addLinkFunction } from "./Graph";
 
 export function InlinkForm({ reload, addLink }: {
   reload: () => void,
-  addLink: (link: LinkObject) => void
+  addLink: addLinkFunction
 }) {
   const [sourceNodeTitle, setSourceNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
@@ -58,7 +58,7 @@ export function InlinkForm({ reload, addLink }: {
 
 export function OutlinkForm({ reload, addLink }: {
   reload: () => void,
-  addLink: (link: LinkObject) => void
+  addLink: addLinkFunction
 }) {
   const [targetNodeTitle, setTargetNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
