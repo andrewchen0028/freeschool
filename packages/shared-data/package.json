@@ -1,0 +1,16 @@
+{
+  "name": "shared-data",
+  "version": "0.0.0",
+  "author": "Andrew Chen <andrewchen0028@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewchen0028/freeschool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andrewchen0028/freeschool/issues"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}

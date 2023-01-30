@@ -11,7 +11,7 @@ import { url } from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
-import { Node } from "../../../types";
+import { Node } from "shared-data";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {

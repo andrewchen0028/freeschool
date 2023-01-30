@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { IOLink } from "../../../types";
+import { IOLink } from "shared-data";
 
 export function InlinkCard({ item: inlink }: { item: IOLink }) {
   return (

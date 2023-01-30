@@ -3,7 +3,7 @@ import { NodeObject } from "force-graph";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { url } from "..";
-import { Node } from "../../../types";
+import { Node } from "shared-data";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");

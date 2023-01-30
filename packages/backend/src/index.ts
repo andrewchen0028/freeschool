@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import { Link, PrismaClient } from '@prisma/client';
 
-import { IOLink } from "../../types";
+import { IOLink } from "shared-data";
 
 const app = express();
 app.use(express.json());
