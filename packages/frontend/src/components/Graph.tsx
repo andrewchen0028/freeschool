@@ -2,7 +2,7 @@ import axios from "axios";
 import ForceGraph, { LinkObject, NodeObject } from "force-graph";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 // eslint-disable-next-line no-unused-vars
 import { ForceGraphInstance } from "force-graph";
@@ -24,9 +24,11 @@ export default function Graph() {
 
   const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
+  const params = useParams();
 
   // DEBUG ONLY: Reset database
   const resetGraph = useCallback(() => {
+    navigate('/');
     axios.delete(`${url}/`).then(() => {
       axios.get(`${url}/`).then((response) => {
         setNodes(response.data.nodes);
@@ -41,11 +43,13 @@ export default function Graph() {
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()
       (document.getElementById("graph") as HTMLElement);
-    axios.get(`${url}/`).then((response) => {
+    const path = params.superNodeId === "-1" ?
+      `${url}/` : `${url}/subgraph/${params.superNodeId}`;
+    axios.get(path).then((response) => {
       setNodes(response.data.nodes);
       setLinks(response.data.links);
     });
-  }, []);
+  }, [params]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
@@ -83,9 +87,12 @@ export default function Graph() {
       })
       .onNodeHover((nodeObject) => { setHover(nodeObject); })
       .onNodeClick((nodeObject) => {
-        navigate(`${nodeObject.id}/${(nodeObject as Node).title}`);
+        navigate(`/subgraph/${params.superNodeId}/${params.superNodeTitle}/node/${nodeObject.id}/${(nodeObject as Node).title}`);
+      })
+      .onNodeRightClick((nodeObject) => {
+        navigate(`/subgraph/${nodeObject.id}/${(nodeObject as Node).title}`);
       });
-  }, [graphRef, hover, navigate]);
+  }, [graphRef, params, hover, navigate]);
 
   useEffect(function redrawGraph() {
     if (graphRef.current) { graphRef.current.graphData({ nodes, links }); }

@@ -1,8 +1,7 @@
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Graph from './components/Graph';
 import NodeWindow from './components/NodeWindow';
-
 import { InlinkList, OutlinkList, ResourceList } from './components/ItemList';
 
 import "./index.css";
@@ -15,14 +14,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Graph />}>
+      <Route path="/" element={<Navigate to="/subgraph/-1/base" />} />
+      <Route path="/subgraph/:superNodeId/:superNodeTitle" element={<Graph />}>
         <Route path="createNode" element={<NodeForm />} />
-        <Route path="createUser" element={<UserForm />} />
-        <Route path=":nodeId/:nodeTitle" element={<NodeWindow />}>
-          <Route path="resources" element={<ResourceList />} />
-          <Route path="inlinks" element={<InlinkList />} />
-          <Route path="outlinks" element={<OutlinkList />} />
-        </Route>
+        <Route path="createAccount" element={<UserForm />} />
+        <Route path="node/:nodeId/:nodeTitle" element={<NodeWindow />} />
       </Route>
     </Routes>
   </BrowserRouter>

@@ -17,20 +17,34 @@ model User {
 
 model Link {
   id         Int  @id @default(autoincrement())
-  sourceNode Node @relation("sourceNodeIdToNode", fields: [source], references: [id])
-  targetNode Node @relation("targetNodeIdToNode", fields: [target], references: [id])
+  sourceNode Node @relation("sourceIdToSourceNode", fields: [source], references: [id])
+  targetNode Node @relation("targetIdToTargetNode", fields: [target], references: [id])
   source     Int
   target     Int
 
   @@map("links")
 }
 
+model Sublink {
+  id        Int  @id @default(autoincrement())
+  superNode Node @relation("superIdToSuperNode", fields: [superId], references: [id])
+  subNode   Node @relation("subIdToSubNode", fields: [subId], references: [id])
+  superId   Int
+  subId     Int
+  score     Int  @default(0)
+
+  @@map("sublinks")
+}
+
 model Node {
   id                 Int        @id @default(autoincrement())
   score              Int        @default(0)
   title              String     @unique
-  sourceNodeIdToNode Link[]     @relation("sourceNodeIdToNode")
-  targetNodeIdToNode Link[]     @relation("targetNodeIdToNode")
+  isBase             Boolean    @default(false)
+  sourceNodeIdToNode Link[]     @relation("sourceIdToSourceNode")
+  targetNodeIdToNode Link[]     @relation("targetIdToTargetNode")
+  superNodeIdToNode  Sublink[]  @relation("superIdToSuperNode")
+  subNodeIdToNode    Sublink[]  @relation("subIdToSubNode")
   resources          Resource[]
 
   @@map("nodes")

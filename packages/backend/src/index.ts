@@ -12,18 +12,63 @@ const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
+const Sublink = prisma.sublink;
 
-app.get("/", function getGraph(_, res) {
-  Promise.all([
-    Node.findMany(),
-    Link.findMany()
-  ]).then(([nodes, links]) => {
-    return res.json({ nodes, links }).status(200).end();
+app.get("/", async function getBaseGraph(_, response) {
+  Node.findMany({
+    where: {
+      subNodeIdToNode: {
+        none: {},
+      },
+    },
+  }).then((nodes) => {
+    const nodeIds = nodes.map((node) => { return node.id });
+    Link.findMany({
+      where: {
+        OR: [
+          { source: { in: nodeIds } },
+          { target: { in: nodeIds } },
+        ]
+      }
+    }).then((links) => {
+      return response.json({ nodes, links }).status(200).end();
+    }).catch((error) => {
+      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
+      return response.status(500).end();
+    })
   }).catch((error) => {
-    console.warn(`Failed to get graph: ${error}`);
-    return res.status(500).end();
+    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
+    return response.status(500).end();
   });
 });
+
+app.get("/subgraph/:nodeId", function getSubgraph(request, response) {
+  Node.findMany({
+    where: {
+      subNodeIdToNode: {
+        some: { superId: parseInt(request.params.nodeId) },
+      },
+    },
+  }).then((nodes) => {
+    const nodeIds = nodes.map((node) => { return node.id });
+    Link.findMany({
+      where: {
+        OR: [
+          { source: { in: nodeIds } },
+          { target: { in: nodeIds } },
+        ]
+      }
+    }).then((links) => {
+      return response.json({ nodes, links }).status(200).end();
+    }).catch((error) => {
+      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
+      return response.status(500).end();
+    })
+  }).catch((error) => {
+    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
+    return response.status(500).end();
+  });
+})
 
 app.get("/:nodeId", function getNodeWindow(req, res) {
   Node.findUnique({
@@ -215,13 +260,17 @@ app.post('/user', async (req, res) => {
 app.delete("/", async function resetDatabase(_, res) {
   // Had to change order to keep referential integrity - would be better if we set "cascade: true" here
   await Link.deleteMany();
+  await Sublink.deleteMany();
   await Resource.deleteMany();
   await Node.deleteMany();
 
   await Node.createMany({
     data: [
-      { id: 0, title: "Calculus 1" },
-      { id: 1, title: "Calculus 2" },
+      { id: 0, title: "Calculus 1", isBase: true },
+      { id: 1, title: "Calculus 2", isBase: true },
+      { id: 2, title: "Continuity" },
+      { id: 3, title: "Limits" },
+      { id: 4, title: "Derivatives" },
     ]
   });
   await Link.create({ data: { id: 0, source: 0, target: 1 } });
@@ -233,6 +282,14 @@ app.delete("/", async function resetDatabase(_, res) {
       { nodeId: 1, url: "https://www.cia.gov" },
     ]
   });
+  await Sublink.createMany({
+    data: [
+      { id: 0, superId: 0, subId: 2 },
+      { id: 1, superId: 0, subId: 3 },
+      { id: 2, superId: 0, subId: 4 }
+    ]
+  });
+
   return res.status(200).end();
 }
 );
