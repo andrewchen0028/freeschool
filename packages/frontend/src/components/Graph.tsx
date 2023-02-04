@@ -26,17 +26,6 @@ export default function Graph() {
   const navigate = useNavigate();
   const params = useParams();
 
-  // DEBUG ONLY: Reset database
-  const resetGraph = useCallback(() => {
-    navigate('/');
-    axios.delete(`${url}/`).then(() => {
-      axios.get(`${url}/`).then((response) => {
-        setNodes(response.data.nodes);
-        setLinks(response.data.links);
-      });
-    });
-  }, []);
-
   function addNode(node: NodeObject) { setNodes([...nodes, node]); }
   function addLink(link: LinkObject) { setLinks([...links, link]); }
 
@@ -100,7 +89,7 @@ export default function Graph() {
 
   return (
     <div>
-      <TopBar resetGraph={resetGraph} />
+      <TopBar />
       <BottomBar />
       <div id="graph" className="h-screen w-screen" />
       <Outlet context={[addNode, addLink]} />

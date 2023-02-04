@@ -5,6 +5,9 @@
   "scripts": {
     "start": "nodemon src/index.ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "author": "Andrew Chen",
   "license": "ISC",
   "dependencies": {

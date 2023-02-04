@@ -253,46 +253,7 @@ app.post('/user', async (req, res) => {
         return res.status(500).end();
     }
   });
-
 });
-
-// DEBUG ONLY
-app.delete("/", async function resetDatabase(_, res) {
-  // Had to change order to keep referential integrity - would be better if we set "cascade: true" here
-  await Link.deleteMany();
-  await Sublink.deleteMany();
-  await Resource.deleteMany();
-  await Node.deleteMany();
-
-  await Node.createMany({
-    data: [
-      { id: 0, title: "Calculus 1", isBase: true },
-      { id: 1, title: "Calculus 2", isBase: true },
-      { id: 2, title: "Continuity" },
-      { id: 3, title: "Limits" },
-      { id: 4, title: "Derivatives" },
-    ]
-  });
-  await Link.create({ data: { id: 0, source: 0, target: 1 } });
-  await Resource.createMany({
-    data: [
-      { nodeId: 0, url: "https://www.fbi.gov" },
-      { nodeId: 0, url: "https://www.atf.gov" },
-      { nodeId: 1, url: "https://www.nsa.gov" },
-      { nodeId: 1, url: "https://www.cia.gov" },
-    ]
-  });
-  await Sublink.createMany({
-    data: [
-      { id: 0, superId: 0, subId: 2 },
-      { id: 1, superId: 0, subId: 3 },
-      { id: 2, superId: 0, subId: 4 }
-    ]
-  });
-
-  return res.status(200).end();
-}
-);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
