@@ -12,7 +12,47 @@ const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
-const Sublink = prisma.sublink;
+// const Sublink = prisma.sublink;
+
+app.get("/graph/:nodeTitle", async function getGraph(req, res) {
+  // Find supernode
+  let supernode = await Node.findUnique({
+    where: { title: req.params.nodeTitle }
+  });
+  if (!supernode) {
+    console.warn(`getGraph() failed to find node ${req.params.nodeTitle}`);
+    return res.status(500).end();
+  }
+
+  // Find subnodes
+  let nodes = await Node.findMany({
+    where: {
+      subNodeIdToNode: {
+        some: { superId: supernode.id }
+      }
+    }
+  });
+  if (!nodes.length) {
+    return res.status(204).end();
+  }
+
+  // Find links
+  let links = await Link.findMany({
+    where: {
+      OR: [
+        { source: { in: nodes.map(node => node.id) } },
+        { target: { in: nodes.map(node => node.id) } },
+      ]
+    }
+  });
+  if (!links.length) {
+    console.warn(`getGraph() failed to find links`);
+    return res.status(500).end();
+  }
+
+  // Return graph data
+  return res.json({ nodes, links }).status(200).end();
+});
 
 app.get("/", async function getBaseGraph(_, response) {
   Node.findMany({
@@ -42,37 +82,37 @@ app.get("/", async function getBaseGraph(_, response) {
   });
 });
 
-app.get("/subgraph/:nodeId", function getSubgraph(request, response) {
-  Node.findMany({
-    where: {
-      subNodeIdToNode: {
-        some: { superId: parseInt(request.params.nodeId) },
-      },
-    },
-  }).then((nodes) => {
-    const nodeIds = nodes.map((node) => { return node.id });
-    Link.findMany({
-      where: {
-        OR: [
-          { source: { in: nodeIds } },
-          { target: { in: nodeIds } },
-        ]
-      }
-    }).then((links) => {
-      return response.json({ nodes, links }).status(200).end();
-    }).catch((error) => {
-      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
-      return response.status(500).end();
-    })
-  }).catch((error) => {
-    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
-    return response.status(500).end();
-  });
-})
+// app.get("/subgraph/:nodeId", function getSubgraph(request, response) {
+//   Node.findMany({
+//     where: {
+//       subNodeIdToNode: {
+//         some: { superId: parseInt(request.params.nodeId) },
+//       },
+//     },
+//   }).then((nodes) => {
+//     const nodeIds = nodes.map((node) => { return node.id });
+//     Link.findMany({
+//       where: {
+//         OR: [
+//           { source: { in: nodeIds } },
+//           { target: { in: nodeIds } },
+//         ]
+//       }
+//     }).then((links) => {
+//       return response.json({ nodes, links }).status(200).end();
+//     }).catch((error) => {
+//       console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
+//       return response.status(500).end();
+//     })
+//   }).catch((error) => {
+//     console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
+//     return response.status(500).end();
+//   });
+// })
 
-app.get("/:nodeId", function getNodeWindow(req, res) {
+app.get("/node/:nodeTitle", function getNodeWindow(req, res) {
   Node.findUnique({
-    where: { id: parseInt(req.params.nodeId) },
+    where: { title: req.params.nodeTitle },
   }).then((node) => {
     return res.json(node).status(200).end();
   }).catch((error) => {
@@ -81,9 +121,9 @@ app.get("/:nodeId", function getNodeWindow(req, res) {
   });
 });
 
-app.get("/:nodeId/resources", function getNodeResources(req, res) {
+app.get("/:nodeTitle/resources", function getNodeResources(req, res) {
   Resource.findMany({
-    where: { nodeId: parseInt(req.params.nodeId) }
+    where: { node: { title: req.params.nodeTitle } }
   }).then((resources) => {
     return res.json(resources).status(200).end();
   }).catch((error) => {
@@ -92,22 +132,30 @@ app.get("/:nodeId/resources", function getNodeResources(req, res) {
   });
 });
 
-app.get("/:nodeId/inlinks", function getInlinks(req, res) {
+app.get("/:nodeTitle/inlinks", function getInlinks(req, res) {
   Link.findMany({
-    where: { target: parseInt(req.params.nodeId) },
+    where: { targetNode: { title: req.params.nodeTitle } },
     select: { sourceNode: true }
-  })
-    .then(sourceNodes => res.json(sourceNodes.map(({ sourceNode }) => sourceNode)).status(200).end())
-    .catch(error => res.status(500).send(error).end());
+  }).then((sourceNodes) => {
+    return res.json(sourceNodes.map(({ sourceNode }) => sourceNode))
+      .status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get inlinks: ${error}`);
+    return res.status(500).send(error).end();
+  });
 });
 
-app.get("/:nodeId/outlinks", function getOutlinks(req, res) {
+app.get("/:nodeTitle/outlinks", function getOutlinks(req, res) {
   Link.findMany({
-    where: { source: parseInt(req.params.nodeId) },
+    where: { sourceNode: { title: req.params.nodeTitle } },
     select: { targetNode: true }
-  })
-    .then(targetNodes => res.json(targetNodes.map(({ targetNode }) => targetNode)).status(200).end())
-    .catch(error => res.status(500).send(error).end());
+  }).then((targetNodes) => {
+    return res.json(targetNodes.map(({ targetNode }) => targetNode))
+      .status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get outlinks: ${error}`);
+    return res.status(500).send(error).end();
+  });
 });
 
 app.get("/user", (_, res) => {
@@ -115,6 +163,7 @@ app.get("/user", (_, res) => {
     return res.json(users).status(200).end();
   });
 });
+
 
 app.post("/node", function postNode(req, res) {
   Node.create({ data: { title: req.body.title } }).then((node) => {
@@ -254,6 +303,7 @@ app.post('/user', async (req, res) => {
     }
   });
 });
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

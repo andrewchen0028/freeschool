@@ -1,11 +1,7 @@
 import axios from "axios";
-import ForceGraph, { LinkObject, NodeObject } from "force-graph";
-
-import { useCallback, useEffect, useRef, useState } from "react";
+import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from "force-graph";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-
-// eslint-disable-next-line no-unused-vars
-import { ForceGraphInstance } from "force-graph";
 
 import { url } from "..";
 import colors from "../colors";
@@ -24,7 +20,7 @@ export default function Graph() {
 
   const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
-  const params = useParams();
+  const { superNodeTitle } = useParams();
 
   function addNode(node: NodeObject) { setNodes([...nodes, node]); }
   function addLink(link: LinkObject) { setLinks([...links, link]); }
@@ -32,13 +28,7 @@ export default function Graph() {
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()
       (document.getElementById("graph") as HTMLElement);
-    const path = params.superNodeId === "-1" ?
-      `${url}/` : `${url}/subgraph/${params.superNodeId}`;
-    axios.get(path).then((response) => {
-      setNodes(response.data.nodes);
-      setLinks(response.data.links);
-    });
-  }, [params]);
+  }, []);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
@@ -53,7 +43,7 @@ export default function Graph() {
       ctx.fill();
     }
 
-    if (graphRef.current) graphRef.current
+    graphRef.current!
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200])
@@ -74,17 +64,30 @@ export default function Graph() {
         ctx.fillStyle = colors.orange[600];
         ctx.fillText(node.title, node.x!, node.y!);
       })
-      .onNodeHover((nodeObject) => { setHover(nodeObject); })
-      .onNodeClick((nodeObject) => {
-        navigate(`/subgraph/${params.superNodeId}/${params.superNodeTitle}/node/${nodeObject.id}/${(nodeObject as Node).title}`);
-      })
-      .onNodeRightClick((nodeObject) => {
-        navigate(`/subgraph/${nodeObject.id}/${(nodeObject as Node).title}`);
-      });
-  }, [graphRef, params, hover, navigate]);
+      .onNodeHover(nodeObject => setHover(nodeObject))
+      // TODO-bugfix:
+      //  - Right-click into the subgraph of node A and immediately click into subnode A'.
+      //  - NodeWindow A opens instead of NodeWindow A'.
+      .onNodeClick(nodeObject => navigate(`/${superNodeTitle}/${(nodeObject as Node).title}`))
+      .onNodeRightClick(nodeObject => navigate(`/${(nodeObject as Node).title}`));
+  }, [graphRef, superNodeTitle, hover, navigate]);
+
+  // TODO-bugfix: Handle expanding leaf nodes - currently this will
+  // navigate to the empty subgraph route, leaving the user with a
+  // false graph
+  useEffect(function reloadData() {
+    axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
+      if (res.data.nodes) {
+        setNodes(res.data.nodes);
+        setLinks(res.data.links);
+      } else {
+        console.warn(`${superNodeTitle} has no subnodes`);
+      }
+    });
+  }, [superNodeTitle]);
 
   useEffect(function redrawGraph() {
-    if (graphRef.current) { graphRef.current.graphData({ nodes, links }); }
+    graphRef.current!.graphData({ nodes, links });
   }, [graphRef, nodes, links]);
 
   return (

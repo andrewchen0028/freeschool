@@ -1,30 +1,31 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { InlinkList, OutlinkList, ResourceList } from "./ItemList";
 import { url } from "..";
 
 function NodeWindowSideBar() {
   const navigate = useNavigate();
 
   return (<div className="bg-neutral-800 bg-opacity-80 flex-grow"
-    onClick={() => { navigate(`/`); }} />);
+    onClick={() => { navigate(`..`); }} />);
 }
 
 
-function NodeWindowHeader({ nodeId }) {
+function NodeWindowHeader({ focusNodeTitle }) {
   const [nodeMetadata, setNodeMetadata] = useState();
 
   function vote(type) {
-    axios.post(`${url}/${nodeId}/vote/${type}`).then(reload);
+    axios.post(`${url}/${focusNodeTitle}/vote/${type}`).then(reload);
   }
 
   function reload() {
-    axios.get(`${url}/${nodeId}`).then((response) => {
+    axios.get(`${url}/node/${focusNodeTitle}`).then((response) => {
       setNodeMetadata(response.data);
     });
   }
 
-  useEffect(reload, [nodeId]);
+  useEffect(reload, [focusNodeTitle]);
 
   return (!nodeMetadata ? <div /> :
     <div className="flex items-center gap-2 text-xl">
@@ -46,13 +47,7 @@ function NodeWindowHeader({ nodeId }) {
 // Note that <ItemListSelectors /> doesn't currently know about "params.nodeId"
 // like <NodeWindowHeader /> does. Therefore, <ItemListSelectors /> won't reset
 // to "resources" upon jumping to another node through "inlinks/outlinks".
-function ItemListSelectors() {
-  const [itemType, setItemType] = useState("resources");
-
-  const navigate = useNavigate();
-
-  useEffect(() => { navigate(itemType); }, [itemType, navigate]);
-
+function ItemListSelectors({ setItemType }) {
   return (
     <div className="card flex gap-2">
       {/* TODO-low: implement sorted ItemLists */}
@@ -82,16 +77,21 @@ function ItemListSelectors() {
 //              warning of this situation, and interacting with the buttons on
 //              the page will silent-crash the backend.
 export default function NodeWindow() {
+  const [itemType, setItemType] = useState("resources");
   const [, addLink] = useOutletContext();
-  const { nodeId } = useParams();
+  const { focusNodeTitle } = useParams();
 
   return (
     <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
       <NodeWindowSideBar />
       <div className="w-3/5 bg-white overflow-y-scroll">
-        <NodeWindowHeader nodeId={nodeId} />
-        <ItemListSelectors />
-        <Outlet context={[addLink]} />
+        <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
+        <ItemListSelectors setItemType={setItemType} />
+        {{
+          "resources": <ResourceList focusNodeTitle={focusNodeTitle} />,
+          "inlinks": <InlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />,
+          "outlinks": <OutlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />
+        }[itemType]}
       </div>
       <NodeWindowSideBar />
 

@@ -30,7 +30,7 @@ export function InlinkForm({ reload, addLink }: {
       setSourceNodeTitle("");
       reload();
     }).catch((error) => {
-      console.log(error);
+      console.warn(error);
       setErrorFlag(error.response.status);
     });
   }
