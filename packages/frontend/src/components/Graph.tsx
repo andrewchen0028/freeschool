@@ -28,7 +28,15 @@ export default function Graph() {
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()
       (document.getElementById("graph") as HTMLElement);
-  }, []);
+      axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
+        if (res.data.nodes) {
+          setNodes(res.data.nodes);
+          setLinks(res.data.links);
+        } else {
+          console.warn(`${superNodeTitle} has no subnodes`);
+        }
+      });
+  }, [superNodeTitle]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
   // otherwise the graph gets redrawn from scratch upon closing a node window.
@@ -42,11 +50,15 @@ export default function Graph() {
       ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2, false);
       ctx.fill();
     }
-
     graphRef.current!
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200])
+      .onNodeClick(nodeObject => {
+        const node = nodeObject as Node;
+        console.log("Clicked ", node.title);
+        navigate(`/${superNodeTitle}/${node.title}`);
+      })
       .nodePointerAreaPaint((nodeObject, color, ctx) => {
         paintRing(nodeObject, color, ctx, (nodeObject as Node).__bckgRadius!);
       })
@@ -65,29 +77,26 @@ export default function Graph() {
         ctx.fillText(node.title, node.x!, node.y!);
       })
       .onNodeHover(nodeObject => setHover(nodeObject))
-      // TODO-bugfix:
-      //  - Right-click into the subgraph of node A and immediately click into subnode A'.
-      //  - NodeWindow A opens instead of NodeWindow A'.
-      .onNodeClick(nodeObject => navigate(`/${superNodeTitle}/${(nodeObject as Node).title}`))
       .onNodeRightClick(nodeObject => navigate(`/${(nodeObject as Node).title}`));
-  }, [graphRef, superNodeTitle, hover, navigate]);
+    }, [graphRef, superNodeTitle, hover, navigate]);
 
   // TODO-bugfix: Handle expanding leaf nodes - currently this will
   // navigate to the empty subgraph route, leaving the user with a
   // false graph
-  useEffect(function reloadData() {
-    axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
-      if (res.data.nodes) {
-        setNodes(res.data.nodes);
-        setLinks(res.data.links);
-      } else {
-        console.warn(`${superNodeTitle} has no subnodes`);
-      }
-    });
-  }, [superNodeTitle]);
+  // useEffect(function reloadData() {
+  //   for (let i = 0; i < 1000000000; i++) { let j = i; } // Sleep statement
+  //   axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
+  //     if (res.data.nodes) {
+  //       setNodes(res.data.nodes);
+  //       setLinks(res.data.links);
+  //     } else {
+  //       console.warn(`${superNodeTitle} has no subnodes`);
+  //     }
+  //   });
+  // }, [superNodeTitle]);
 
   useEffect(function redrawGraph() {
-    graphRef.current!.graphData({ nodes, links });
+    if (graphRef.current) graphRef.current.graphData({ nodes, links });
   }, [graphRef, nodes, links]);
 
   return (

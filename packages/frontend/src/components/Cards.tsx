@@ -11,7 +11,7 @@ import { Node, Resource } from "@prisma/client";
 export function InlinkCard({ sourceNode }: { sourceNode: Node }) {
   return (
     <div className="card z-10">
-      from <Link to={`../../${sourceNode.title}/resources`}
+      from <Link to={`../${sourceNode.title}`}
         className="text-blue-600 underline">
         {sourceNode.title}
       </Link>
@@ -22,7 +22,7 @@ export function InlinkCard({ sourceNode }: { sourceNode: Node }) {
 export function OutlinkCard({ targetNode }: { targetNode: Node }) {
   return (
     <div className="card z-10">
-      to <Link to={`../../${targetNode.title}/resources`}
+      to <Link to={`../${targetNode.title}`}
         className="text-blue-600 underline">
         {targetNode.title}
       </Link>
