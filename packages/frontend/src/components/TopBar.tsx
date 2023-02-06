@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 export default function TopBar() {
   const navigate = useNavigate();
-  const [graphTitle, setGraphTitle] = useState("base");
 
   return (
     <div className="absolute top-0 left-0 h-16 w-screen

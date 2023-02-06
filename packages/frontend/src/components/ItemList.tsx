@@ -1,6 +1,5 @@
 import axios from "axios";
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { url } from "..";
 import { InlinkCard, OutlinkCard, ResourceCard } from "./Cards";
 import { InlinkForm, OutlinkForm, ResourceForm } from "./Forms";

@@ -1,6 +1,6 @@
 import axios from "axios";
-import ForceGraph, { ForceGraphInstance, LinkObject, NodeObject } from "force-graph";
-import { useEffect, useRef, useState } from "react";
+import ForceGraph, { ForceGraphInstance, GraphData, LinkObject, NodeObject } from "force-graph";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import { url } from "..";
@@ -11,31 +11,35 @@ import { Node } from "shared-data";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
-  // Hold force-graph NodeObject objects in state, even though they don't have
-  // the "title" and "__bckgRadius" properties: just cast NodeObjects using
-  // "as Node" before using those properties.
-  const [nodes, setNodes] = useState<NodeObject[]>([]);
-  const [links, setLinks] = useState<LinkObject[]>([]);
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
   const [hover, setHover] = useState<NodeObject | null>();
 
   const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
   const { superNodeTitle } = useParams();
 
-  function addNode(node: NodeObject) { setNodes([...nodes, node]); }
-  function addLink(link: LinkObject) { setLinks([...links, link]); }
+  const paintRing = useCallback((node: NodeObject, color: string,
+    ctx: CanvasRenderingContext2D, radius: number) => {
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2, false);
+    ctx.fill();
+  }, []);
+
+  function addNode(node: NodeObject) { setGraphData({ ...graphData, nodes: [...graphData.nodes, node] }); }
+  function addLink(link: LinkObject) { setGraphData({ ...graphData, links: [...graphData.links, link] }); }
 
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()
-      (document.getElementById("graph") as HTMLElement);
-      axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
-        if (res.data.nodes) {
-          setNodes(res.data.nodes);
-          setLinks(res.data.links);
-        } else {
-          console.warn(`${superNodeTitle} has no subnodes`);
-        }
-      });
+      (document.getElementById("graph") as HTMLElement)
+      .linkDirectionalArrowLength(4.0)
+      .linkDirectionalArrowRelPos(0.5)
+      .backgroundColor(colors.slate[200]);
+    axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
+      res.data.nodes
+        ? setGraphData({ nodes: res.data.nodes, links: res.data.links })
+        : console.warn(`${superNodeTitle} has no subnodes`);
+    });
   }, [superNodeTitle]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
@@ -43,21 +47,9 @@ export default function Graph() {
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
-    function paintRing(node: NodeObject, color: string,
-      ctx: CanvasRenderingContext2D, radius: number) {
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2, false);
-      ctx.fill();
-    }
     graphRef.current!
-      .linkDirectionalArrowLength(4.0)
-      .linkDirectionalArrowRelPos(0.5)
-      .backgroundColor(colors.slate[200])
-      .onNodeClick(nodeObject => {
-        const node = nodeObject as Node;
-        console.log("Clicked ", node.title);
-        navigate(`/${superNodeTitle}/${node.title}`);
+      .onNodeClick((nodeObject) => {
+        navigate(`/${superNodeTitle}/${(nodeObject as Node).title}`);
       })
       .nodePointerAreaPaint((nodeObject, color, ctx) => {
         paintRing(nodeObject, color, ctx, (nodeObject as Node).__bckgRadius!);
@@ -76,28 +68,13 @@ export default function Graph() {
         ctx.fillStyle = colors.orange[600];
         ctx.fillText(node.title, node.x!, node.y!);
       })
-      .onNodeHover(nodeObject => setHover(nodeObject))
-      .onNodeRightClick(nodeObject => navigate(`/${(nodeObject as Node).title}`));
-    }, [graphRef, superNodeTitle, hover, navigate]);
-
-  // TODO-bugfix: Handle expanding leaf nodes - currently this will
-  // navigate to the empty subgraph route, leaving the user with a
-  // false graph
-  // useEffect(function reloadData() {
-  //   for (let i = 0; i < 1000000000; i++) { let j = i; } // Sleep statement
-  //   axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
-  //     if (res.data.nodes) {
-  //       setNodes(res.data.nodes);
-  //       setLinks(res.data.links);
-  //     } else {
-  //       console.warn(`${superNodeTitle} has no subnodes`);
-  //     }
-  //   });
-  // }, [superNodeTitle]);
+      .onNodeHover((nodeObject) => { setHover(nodeObject); })
+      .onNodeRightClick((nodeObject) => { navigate(`/${(nodeObject as Node).title}`); });
+  }, [graphRef, superNodeTitle, hover, paintRing, navigate]);
 
   useEffect(function redrawGraph() {
-    if (graphRef.current) graphRef.current.graphData({ nodes, links });
-  }, [graphRef, nodes, links]);
+    graphRef.current!.graphData(graphData)
+  }, [graphRef, graphData]);
 
   return (
     <div>

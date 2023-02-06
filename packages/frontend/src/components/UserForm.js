@@ -47,8 +47,6 @@ export default function UserForm() {
             <input id="username" className="card"
               placeholder="Username" required="required"
               value={username} onChange={handleUsernameChange} />
-            {/* TODO-high: make all errorflags default to 0,
-            and switch to label-based error handling */}
             <label htmlFor="username" className="text-red-500"
               children={{
                 0: <div />,
