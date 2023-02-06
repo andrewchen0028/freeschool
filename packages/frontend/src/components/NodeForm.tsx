@@ -4,12 +4,13 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { url } from "..";
 import { Node } from "shared-data";
+import { addNodeFunction } from "./Graph";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
 
-  const [addNode] = useOutletContext<[(node: NodeObject) => void]>();
+  const [addNode] = useOutletContext<[addNodeFunction]>();
   const navigate = useNavigate();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -20,15 +21,12 @@ export default function NodeForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    axios.post(`${url}/node`, {
-      title: title
-    }).then((response) => {
+    // TODO-BUGFIX: doesn't correctly handle addNode on empty subgraph
+    axios.post(`${url}/node`, { title: title }).then((response) => {
       let node: Node = response.data;
       addNode({ id: node.id, title: node.title } as NodeObject);
-      navigate(`../${node.id}/${node.title}`);
-    }).catch((error) => {
-      setErrorFlag(error.response.status);
-    });
+      navigate(`../${node.title}`);
+    }).catch((error) => { setErrorFlag(error.response.status); });
   }
 
   return (
@@ -48,14 +46,12 @@ export default function NodeForm() {
         bg-neutral-800 bg-opacity-80">
       <div className="card bg-white"
         onClick={(event) => { event.stopPropagation(); }}>
-        {
-          {
-            409: <p className="text-red-500"
-              children={`Node "${title}" already exists`} />,
-            500: <p className="text-red-500"
-              children="Internal server error" />
-          }[errorFlag]
-        }
+        {{
+          409: <p className="text-red-500"
+            children={`Node "${title}" already exists`} />,
+          500: <p className="text-red-500"
+            children="Internal server error" />
+        }[errorFlag]}
         <form onSubmit={handleSubmit}>
           <input className="card" placeholder="Node Title" required={true}
             value={title} onChange={handleChange} />

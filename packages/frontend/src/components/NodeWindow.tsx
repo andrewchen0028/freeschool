@@ -23,7 +23,7 @@ function NodeWindowHeader({ focusNodeTitle }: { focusNodeTitle: string }) {
   }
 
   function reload() {
-    axios.get(`${url}/node/${focusNodeTitle}`).then((response) => {
+    axios.get(`${url}/${focusNodeTitle}/node`).then((response) => {
       setNodeMetadata(response.data);
     });
   }

@@ -12,29 +12,20 @@ const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
-// const Sublink = prisma.sublink;
 
-app.get("/graph/:nodeTitle", async function getGraph(req, res) {
+// Graphs
+app.get("/:nodeTitle", async function getGraphData(req, res) {
   // Find supernode
-  let supernode = await Node.findUnique({
-    where: { title: req.params.nodeTitle }
-  });
-  if (!supernode) {
-    console.warn(`getGraph() failed to find node ${req.params.nodeTitle}`);
-    return res.status(500).end();
-  }
+  let supernode = await Node.findUnique({ where: { title: req.params.nodeTitle } });
+  if (!supernode) return res.status(500)
+    .send(`getGraph(): Supernode ${req.params.nodeTitle} not found`).end();
 
   // Find subnodes
   let nodes = await Node.findMany({
-    where: {
-      subNodeIdToNode: {
-        some: { superId: supernode.id }
-      }
-    }
+    where: { subNodeIdToNode: { some: { superId: supernode.id } } }
   });
-  if (!nodes.length) {
-    return res.status(204).end();
-  }
+  if (!nodes.length) return res.status(204).end();
+
 
   // Find links
   let links = await Link.findMany({
@@ -45,72 +36,15 @@ app.get("/graph/:nodeTitle", async function getGraph(req, res) {
       ]
     }
   });
-  if (!links.length) {
-    console.warn(`getGraph() failed to find links`);
-    return res.status(500).end();
-  }
+  if (!links.length) return res.status(500)
+    .send(`getGraph() failed to find links`).end();
 
   // Return graph data
   return res.json({ nodes, links }).status(200).end();
 });
 
-app.get("/", async function getBaseGraph(_, response) {
-  Node.findMany({
-    where: {
-      subNodeIdToNode: {
-        none: {},
-      },
-    },
-  }).then((nodes) => {
-    const nodeIds = nodes.map((node) => { return node.id });
-    Link.findMany({
-      where: {
-        OR: [
-          { source: { in: nodeIds } },
-          { target: { in: nodeIds } },
-        ]
-      }
-    }).then((links) => {
-      return response.json({ nodes, links }).status(200).end();
-    }).catch((error) => {
-      console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
-      return response.status(500).end();
-    })
-  }).catch((error) => {
-    console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
-    return response.status(500).end();
-  });
-});
-
-// app.get("/subgraph/:nodeId", function getSubgraph(request, response) {
-//   Node.findMany({
-//     where: {
-//       subNodeIdToNode: {
-//         some: { superId: parseInt(request.params.nodeId) },
-//       },
-//     },
-//   }).then((nodes) => {
-//     const nodeIds = nodes.map((node) => { return node.id });
-//     Link.findMany({
-//       where: {
-//         OR: [
-//           { source: { in: nodeIds } },
-//           { target: { in: nodeIds } },
-//         ]
-//       }
-//     }).then((links) => {
-//       return response.json({ nodes, links }).status(200).end();
-//     }).catch((error) => {
-//       console.warn(`getBaseGraph in backend index failed to get links: ${error}`);
-//       return response.status(500).end();
-//     })
-//   }).catch((error) => {
-//     console.warn(`getBaseGraph in backend index failed to get nodes: ${error}`);
-//     return response.status(500).end();
-//   });
-// })
-
-app.get("/node/:nodeTitle", function getNodeWindow(req, res) {
+// NodeWindows
+app.get("/:nodeTitle/node", function getNodeData(req, res) {
   Node.findUnique({
     where: { title: req.params.nodeTitle },
   }).then((node) => {
@@ -158,6 +92,7 @@ app.get("/:nodeTitle/outlinks", function getOutlinks(req, res) {
   });
 });
 
+// Users
 app.get("/user", (_, res) => {
   User.findMany().then((users) => {
     return res.json(users).status(200).end();
@@ -168,18 +103,16 @@ app.get("/user", (_, res) => {
 app.post("/node", function postNode(req, res) {
   Node.create({ data: { title: req.body.title } }).then((node) => {
     return res.json(node).status(200).end();
-  }).catch(
-    (error) => {
-      console.log(typeof (error));
-      switch (error.code) {
-        case "P2002":
-          console.warn(`Attempted to add duplicate node: ${req.body.title}`);
-          return res.status(409).end();
-        default:
-          console.warn(`Failed to add node ${req.body.title}: ${error}`);
-          return res.status(500).end();
-      }
-    });
+  }).catch((error) => {
+    switch (error.code) {
+      case "P2002":
+        console.warn(`Attempted to add duplicate node: ${req.body.title}`);
+        return res.status(409).end();
+      default:
+        console.warn(`Failed to add node ${req.body.title}: ${error}`);
+        return res.status(500).end();
+    }
+  });
 });
 
 app.post("/:nodeId/vote/:vote", function postNodeVote(req, res) {

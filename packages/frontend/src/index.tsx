@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import Graph from './components/Graph';
+import NodeForm from './components/NodeForm';
 import NodeWindow from './components/NodeWindow';
 
 import "./index.css";
@@ -14,6 +15,7 @@ root.render(
       <Route path="/" element={<Navigate to={"base"} />} />
       <Route path=":superNodeTitle" element={<Graph />}>
         <Route path=":focusNodeTitle" element={<NodeWindow />} />
+        <Route path="createNode" element={<NodeForm />} />
       </Route>
     </Routes>
   </BrowserRouter>

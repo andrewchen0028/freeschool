@@ -35,11 +35,19 @@ export default function Graph() {
       .linkDirectionalArrowLength(4.0)
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200]);
-    axios.get(`${url}/graph/${superNodeTitle}`).then((res) => {
-      res.data.nodes
-        ? setGraphData({ nodes: res.data.nodes, links: res.data.links })
-        : console.warn(`${superNodeTitle} has no subnodes`);
-    });
+    axios.get(`${url}/${superNodeTitle}`).then((res) => {
+      switch (res.status) {
+        case 200:
+          setGraphData({ nodes: res.data.nodes, links: res.data.links })
+          break;
+        case 204:
+          console.warn(`${superNodeTitle} has no subnodes`);
+          break;
+        default:
+          console.warn(`Unrecognized HTTP status: ${res.status}`);
+          break;
+      }
+    }).catch((err) => { console.warn(err.response.data); });
   }, [superNodeTitle]);
 
   // NOTE: Effect initializeGraph() must be separate from initializeGraphRef(), 
