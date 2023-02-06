@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
@@ -11,17 +11,17 @@ export default function UserForm() {
 
   const navigate = useNavigate();
 
-  function handleUsernameChange(event) {
+  function handleUsernameChange(event: ChangeEvent<HTMLInputElement>) {
     setUsername(event.target.value);
     setErrorFlag(0);
   }
 
-  function handlePasswordChange(event) {
+  function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
     setErrorFlag(0);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     axios.post(`${url}/users/`, {
@@ -45,7 +45,7 @@ export default function UserForm() {
         <form onSubmit={handleSubmit} className="flex flex-row">
           <div className="flex flex-col">
             <input id="username" className="card"
-              placeholder="Username" required="required"
+              placeholder="Username" required={true}
               value={username} onChange={handleUsernameChange} />
             <label htmlFor="username" className="text-red-500"
               children={{
@@ -56,17 +56,16 @@ export default function UserForm() {
                 || <p>{`Unrecognized HTTP response: ${errorFlag}`}</p>} />
           </div>
           <div className="flex flex-col">
-            <input className="card" placeholder="Password" required="required"
+            <input className="card" placeholder="Password" required={true}
               value={password} onChange={handlePasswordChange} />
           </div>
           <button className="button" type="submit" children="Submit" />
         </form>
-        <button className="button" children="(dev) log users"
-          onClick={() => {
-            axios.get(`${url}/users/`).then((response) => {
-              console.log(response.data);
-            });
-          }} />
+        <button className="button" onClick={() => {
+          axios.get(`${url}/users/`).then((response) => {
+            console.log(response.data);
+          });
+        }} children="(dev) log users" />
       </div>
     </div>
   );
