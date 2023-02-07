@@ -16,33 +16,30 @@ async function main() {
 
   await Node.createMany({
     data: [
-      { id: 1, title: "base" },
-      { id: 2, title: "Calculus 1" },
-      { id: 3, title: "Calculus 2" },
-      { id: 4, title: "Continuity" },
-      { id: 5, title: "Limits" },
+      { id: 1, title: "Calculus 1" },
+      { id: 2, title: "Calculus 2" },
+      { id: 3, title: "Continuity" },
+      { id: 4, title: "Limits" },
     ]
   });
   await Link.createMany({
     data: [
-      { source: 2, target: 3 },
-      { source: 4, target: 5 }
+      { source: 1, target: 2 },
+      { source: 3, target: 4 }
     ]
   });
   await Resource.createMany({
     data: [
-      { nodeId: 2, url: "https://www.fbi.gov" },
-      { nodeId: 3, url: "https://www.atf.gov" },
-      { nodeId: 4, url: "https://www.nsa.gov" },
-      { nodeId: 5, url: "https://www.cia.gov" },
+      { nodeId: 1, url: "https://www.fbi.gov" },
+      { nodeId: 2, url: "https://www.atf.gov" },
+      { nodeId: 3, url: "https://www.nsa.gov" },
+      { nodeId: 4, url: "https://www.cia.gov" },
     ]
   });
   await Sublink.createMany({
     data: [
-      { superId: 1, subId: 2 },
       { superId: 1, subId: 3 },
-      { superId: 2, subId: 4 },
-      { superId: 2, subId: 5 },
+      { superId: 1, subId: 4 },
     ]
   });
 }

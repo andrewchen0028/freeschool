@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import cors from "cors";
 import express from "express";
 import { PrismaClient } from '@prisma/client';
+import type { Node } from '@prisma/client';
 
 const app = express();
 app.use(express.json());
@@ -15,17 +16,24 @@ const User = prisma.user;
 
 // Graphs
 app.get("/:nodeTitle", async function getGraphData(req, res) {
-  // Find supernode
-  let supernode = await Node.findUnique({ where: { title: req.params.nodeTitle } });
-  if (!supernode) return res.status(500)
-    .send(`getGraph(): Supernode ${req.params.nodeTitle} not found`).end();
+  let nodes: Node[] = [];
+  if (req.params.nodeTitle !== "base") {
+    // Find supernode
+    let supernode = await Node.findUnique({ where: { title: req.params.nodeTitle } });
+    if (!supernode) return res.status(500)
+      .send(`getGraph(): Supernode ${req.params.nodeTitle} not found`).end();
 
-  // Find subnodes
-  let nodes = await Node.findMany({
-    where: { subNodeIdToNode: { some: { superId: supernode.id } } }
-  });
-  if (!nodes.length) return res.status(204).end();
-
+    // Find subnodes
+    nodes = await Node.findMany({
+      where: { subNodeIdToNode: { some: { superId: supernode.id } } }
+    });
+    if (!nodes.length) return res.status(204).end();
+  } else {
+    nodes = await Node.findMany({
+      where: { subNodeIdToNode: { none: {} } }
+    });
+    console.log(nodes);
+  }
 
   // Find links
   let links = await Link.findMany({
@@ -104,14 +112,16 @@ app.post("/node", function postNode(req, res) {
   Node.create({ data: { title: req.body.title } }).then((node) => {
     return res.json(node).status(200).end();
   }).catch((error) => {
-    switch (error.code) {
-      case "P2002":
-        console.warn(`Attempted to add duplicate node: ${req.body.title}`);
-        return res.status(409).end();
-      default:
-        console.warn(`Failed to add node ${req.body.title}: ${error}`);
-        return res.status(500).end();
-    }
+    console.error(error);
+    return res.status(500).end();
+    // switch (error.code) {
+    //   case "P2002":
+    //     console.warn(`Attempted to add duplicate node: ${req.body.title}`);
+    //     return res.status(409).end();
+    //   default:
+    //     console.warn(`Failed to add node ${req.body.title}: ${error}`);
+    //     return res.status(500).end();
+    // }
   });
 });
 
@@ -155,6 +165,7 @@ app.post("/:nodeId/resource", function postResource(req, res) {
     });
 });
 
+// TODO-Bugfix: Adding "Calculus 2" as inlink to "Calculus 3" doesn't work
 app.post("/:nodeId/inlink", function postInlink(req, res) {
   Node.findUnique({
     where: { title: req.body.sourceNodeTitle }
