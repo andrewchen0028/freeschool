@@ -10,7 +10,7 @@ export function InlinkForm({ reload, addLink }: {
 }) {
   const [sourceNodeTitle, setSourceNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
-  const { nodeId } = useParams();
+  const { focusNodeTitle } = useParams();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setSourceNodeTitle(event.target.value);
@@ -19,8 +19,7 @@ export function InlinkForm({ reload, addLink }: {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    axios.post(`${url}/${nodeId}/inlink`, {
+    axios.post(`${url}/${focusNodeTitle}/inlink`, {
       sourceNodeTitle: sourceNodeTitle
     }).then((response) => {
       addLink({
@@ -62,7 +61,7 @@ export function OutlinkForm({ reload, addLink }: {
 }) {
   const [targetNodeTitle, setTargetNodeTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
-  const { nodeId } = useParams();
+  const { focusNodeTitle } = useParams();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setTargetNodeTitle(event.target.value);
@@ -71,8 +70,7 @@ export function OutlinkForm({ reload, addLink }: {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    axios.post(`${url}/${nodeId}/outlink`, {
+    axios.post(`${url}/${focusNodeTitle}/outlink`, {
       targetNodeTitle: targetNodeTitle
     }).then((response) => {
       addLink({

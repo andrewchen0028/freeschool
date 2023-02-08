@@ -13,6 +13,7 @@ const Node = prisma.node;
 const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
+const Sublink = prisma.sublink;
 
 // Graphs
 app.get("/:nodeTitle", async function getGraphData(req, res) {
@@ -108,8 +109,36 @@ app.get("/user", (_, res) => {
 });
 
 
-app.post("/node", function postNode(req, res) {
-  Node.create({ data: { title: req.body.title } }).then((node) => {
+app.post("/node", async function postNode(req, res) {
+  // If we're creating a new node on a subgraph page, we need to mark it as a subnode of the current superNode
+  let superNodeId: number = (req.body.superNodeTitle === "base") ?
+    -1 : await Node.findUnique({
+      where: { title: req.body.superNodeTitle }
+    }).then((superNode) => {
+      if (superNode) return superNode.id;
+      else {
+        console.error(`Failed to find supernode ${req.body.superNodeTitle}`);
+        return -1;
+      }
+    })
+  if (req.body.superNodeTitle !== "base" && superNodeId == -1) {
+    return res.status(500).end();
+  }
+  Node.create({
+    data: {
+      title: req.body.title,
+    }
+  }).then((node) => {
+    if (superNodeId !== -1) {
+      Sublink.create({
+        data: {
+          subId: node.id,
+          superId: superNodeId
+        }
+      }).then((sublink) => {
+        console.log("Sublink: ", sublink);
+      })
+    }
     return res.json(node).status(200).end();
   }).catch((error) => {
     console.error(error);
@@ -166,24 +195,33 @@ app.post("/:nodeId/resource", function postResource(req, res) {
 });
 
 // TODO-Bugfix: Adding "Calculus 2" as inlink to "Calculus 3" doesn't work
-app.post("/:nodeId/inlink", function postInlink(req, res) {
+app.post("/:nodeTitle/inlink", function postInlink(req, res) {
   Node.findUnique({
     where: { title: req.body.sourceNodeTitle }
   }).then((sourceNode) => {
     if (sourceNode) {
-      Link.create({
-        data: {
-          sourceNode: { connect: { id: sourceNode.id } },
-          targetNode: { connect: { id: parseInt(req.params.nodeId) } }
-        }
-      }).then((inlink) => {
-        return res.json(inlink).status(200).end();
-      }).catch(
-        (error) => {
-          console.log(typeof (error));
-          console.warn(`Failed to post inlink: ${error}`);
+      Node.findUnique({
+        where: { title: req.params.nodeTitle }
+      }).then((targetNode) => {
+        if (targetNode) {
+          Link.create({
+            data: {
+              sourceNode: { connect: { id: sourceNode.id } },
+              targetNode: { connect: { id: targetNode.id } }
+            }
+          }).then((inlink) => {
+            return res.json(inlink).status(200).end();
+          }).catch(
+            (error) => {
+              console.log(typeof (error));
+              console.warn(`Failed to post inlink: ${error}`);
+              return res.status(500).end();
+            });
+        } else {
+          console.log(`Failed to find node ${targetNode}`);
           return res.status(500).end();
-        });
+        }
+      })
     } else {
       console.log(`Failed to find node ${sourceNode}`);
       return res.status(500).end();
@@ -195,25 +233,33 @@ app.post("/:nodeId/inlink", function postInlink(req, res) {
   });
 });
 
-app.post("/:nodeId/outlink", function postOutlink(req, res) {
+app.post("/:nodeTitle/outlink", function postOutlink(req, res) {
   Node.findUnique({
     where: { title: req.body.targetNodeTitle }
   }).then((targetNode) => {
     if (targetNode) {
-
-      Link.create({
-        data: {
-          sourceNode: { connect: { id: parseInt(req.params.nodeId) } },
-          targetNode: { connect: { id: targetNode.id } }
-        }
-      }).then((outlink) => {
-        return res.json(outlink).status(200).end();
-      }).catch(
-        (error) => {
-          console.log(typeof (error));
-          console.warn(error);
+      Node.findUnique({
+        where: { title: req.params.nodeTitle }
+      }).then((sourceNode) => {
+        if (sourceNode) {
+          Link.create({
+            data: {
+              sourceNode: { connect: { id: sourceNode.id } },
+              targetNode: { connect: { id: targetNode.id } }
+            }
+          }).then((outlink) => {
+            return res.json(outlink).status(200).end();
+          }).catch(
+            (error) => {
+              console.log(typeof (error));
+              console.warn(`Failed to post outlink: ${error}`);
+              return res.status(500).end();
+            });
+        } else {
+          console.log(`Failed to find node ${sourceNode}`);
           return res.status(500).end();
-        });
+        }
+      })
     } else {
       console.log(`Failed to find node ${targetNode}`);
       return res.status(500).end();
@@ -222,7 +268,7 @@ app.post("/:nodeId/outlink", function postOutlink(req, res) {
     console.log(typeof (error));
     console.log(`Failed to post outlink: ${error}`);
     return res.status(500).end();
-  })
+  });
 });
 
 app.post('/user', async (req, res) => {
