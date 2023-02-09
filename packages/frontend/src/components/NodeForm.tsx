@@ -1,7 +1,7 @@
 import axios from "axios";
 import { NodeObject } from "force-graph";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { url } from "..";
 import { Node } from "shared-data";
 import { addNodeFunction } from "./Graph";
@@ -9,6 +9,8 @@ import { addNodeFunction } from "./Graph";
 export default function NodeForm() {
   const [title, setTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
+
+  const { superNodeTitle } = useParams();
 
   const [addNode] = useOutletContext<[addNodeFunction]>();
   const navigate = useNavigate();
@@ -20,9 +22,8 @@ export default function NodeForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     // TODO-BUGFIX: doesn't correctly handle addNode on empty subgraph
-    axios.post(`${url}/node`, { title: title }).then((response) => {
+    axios.post(`${url}/node`, { title: title, superNodeTitle: superNodeTitle }).then((response) => {
       let node: Node = response.data;
       addNode({ id: node.id, title: node.title } as NodeObject);
       navigate(`../${node.title}`);
