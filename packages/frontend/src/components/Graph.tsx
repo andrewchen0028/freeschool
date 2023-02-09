@@ -36,11 +36,13 @@ export default function Graph() {
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200]);
     axios.get(`${url}/${superNodeTitle}`).then((res) => {
+      console.log("Response data: ", res.data);
       switch (res.status) {
         case 200:
           setGraphData({ nodes: res.data.nodes, links: res.data.links })
           break;
         case 204:
+          setGraphData({ nodes: [], links: [] })
           console.warn(`${superNodeTitle} has no subnodes`);
           break;
         default:

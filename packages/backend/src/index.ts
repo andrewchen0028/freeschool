@@ -33,7 +33,6 @@ app.get("/:nodeTitle", async function getGraphData(req, res) {
     nodes = await Node.findMany({
       where: { subNodeIdToNode: { none: {} } }
     });
-    console.log(nodes);
   }
 
   // Find links
@@ -45,8 +44,6 @@ app.get("/:nodeTitle", async function getGraphData(req, res) {
       ]
     }
   });
-  if (!links.length) return res.status(500)
-    .send(`getGraph() failed to find links`).end();
 
   // Return graph data
   return res.json({ nodes, links }).status(200).end();
