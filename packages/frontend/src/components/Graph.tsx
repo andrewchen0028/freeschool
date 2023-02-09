@@ -36,7 +36,6 @@ export default function Graph() {
       .linkDirectionalArrowRelPos(0.5)
       .backgroundColor(colors.slate[200]);
     axios.get(`${url}/${superNodeTitle}`).then((res) => {
-      console.log("Response data: ", res.data);
       switch (res.status) {
         case 200:
           setGraphData({ nodes: res.data.nodes, links: res.data.links })
