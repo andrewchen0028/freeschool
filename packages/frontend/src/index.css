@@ -19,5 +19,5 @@
     text-neutral-600 hover:bg-neutral-100 active:bg-neutral-200
   }
   .upvote { @apply vote hover:text-orange-600 active:text-orange-600 }
-  .downvote { @apply vote hover:text-indigo-400 active:text-indigo-400 }
+  .downvote { @apply vote hover:text-blue-500 active:text-indigo-400 }
 }

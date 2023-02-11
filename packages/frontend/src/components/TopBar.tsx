@@ -1,4 +1,4 @@
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 // import url from "..";
@@ -35,8 +35,8 @@ export default function TopBar() {
   function GoBackButton() {
     if (graphTitles.length < 2) return <></>;
     else {
-      return <button onClick={() => popSubgraph()}>
-        Go Back
+      return <button onClick={() => popSubgraph()} className="text-sm text-blue-600 underline">
+        Previous subgraph: {graphTitles.at(-2)}
       </button>
     }
   }
@@ -56,8 +56,8 @@ export default function TopBar() {
             children="Create Account" />
         </div>
       </div>
-      <div className="flex-col z-10 align-center items-center h-100% w-100%">
-        <div className="text-sm px-4 my-auto">
+      <div className="flex flex-col z-10 p-2 mr-10 h-100% w-100% items-end">
+        <div className="text-sm my-auto">
           Currently viewing {graphTitles.at(-1)} graph
         </div>
         <GoBackButton/>

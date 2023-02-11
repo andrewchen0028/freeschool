@@ -14,6 +14,7 @@ const Link = prisma.link;
 const Resource = prisma.resource;
 const User = prisma.user;
 const Sublink = prisma.sublink;
+const ResourceComment = prisma.resourceComment;
 
 // Graphs
 app.get("/:nodeTitle", async function getGraphData(req, res) {
@@ -69,6 +70,18 @@ app.get("/:nodeTitle/resources", function getNodeResources(req, res) {
   }).catch((error) => {
     console.warn(`Failed to get resources: ${error}`);
     return res.status(500).end();
+  });
+});
+
+// Called upon selecting Resources within a NodeWindow - fetches the comments for a resource
+app.get("/:nodeId/:resourceId/comments", function getResourceComments(request, response) {
+  ResourceComment.findMany({
+    where: { resourceId: parseInt(request.params.resourceId) }
+  }).then((comments) => {
+    return response.json(comments).status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get resource comments: ${error}`);
+    return response.status(500).end();
   });
 });
 
