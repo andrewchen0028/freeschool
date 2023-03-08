@@ -1,4 +1,9 @@
 const colors = {
+  // Theme colors
+  blackDenim: '#151922',
+  nearWhite: '#e6e6f1',
+  // All colors
+  transparent: '#00000000',
   black: '#000',
   white: '#fff',
   slate: {

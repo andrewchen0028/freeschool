@@ -89,7 +89,7 @@ export default function NodeWindow() {
   return (focusNodeTitle
     ? <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
       <NodeWindowSideBar />
-      <div className="w-3/5 bg-white overflow-y-scroll">
+      <div className="w-3/5 bg-black-denim overflow-y-scroll scrollbar">
         <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
         <ItemListSelectors setItemType={setItemType} />
         {{

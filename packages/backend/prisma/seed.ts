@@ -18,25 +18,25 @@ async function main() {
 
   await Node.createMany({
     data: [
-      { id: 1, title: "Calculus 1" },
-      { id: 2, title: "Calculus 2" },
-      { id: 3, title: "Continuity" },
-      { id: 4, title: "Limits" },
+      { id: 999991, title: "Calculus 1" },
+      { id: 999992, title: "Calculus 2" },
+      { id: 999993, title: "Continuity" },
+      { id: 999994, title: "Limits" },
     ]
   });
   await Link.createMany({
     data: [
-      { source: 1, target: 2 },
-      { source: 3, target: 4 }
+      { source: 999991, target: 999992 },
+      { source: 999993, target: 999994 }
     ]
   });
   await Resource.createMany({
     data: [
-      { id: 0, nodeId: 1, url: "https://www.fbi.gov" },
-      { id: 1, nodeId: 2, url: "https://www.atf.gov" },
-      { id: 2, nodeId: 3, url: "https://www.nsa.gov" },
-      { id: 3, nodeId: 4, url: "https://www.cia.gov" },
-      { id: 5, nodeId: 1, url: "https://www.dhs.gov" },
+      { id: 0, nodeId: 999991, url: "https://www.fbi.gov" },
+      { id: 1, nodeId: 999992, url: "https://www.atf.gov" },
+      { id: 2, nodeId: 999993, url: "https://www.nsa.gov" },
+      { id: 3, nodeId: 999994, url: "https://www.cia.gov" },
+      { id: 5, nodeId: 999991, url: "https://www.dhs.gov" },
     ]
   });
   await ResourceComment.createMany({
@@ -54,8 +54,8 @@ async function main() {
 
   await Sublink.createMany({
     data: [
-      { superId: 1, subId: 3 },
-      { superId: 1, subId: 4 },
+      { superId: 999991, subId: 999993 },
+      { superId: 999991, subId: 999994 },
     ]
   });
 }

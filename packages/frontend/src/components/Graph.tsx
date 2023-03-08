@@ -32,9 +32,10 @@ export default function Graph() {
   useEffect(function initializeGraphRef() {
     graphRef.current = ForceGraph()
       (document.getElementById("graph") as HTMLElement)
-      .linkDirectionalArrowLength(4.0)
+      .linkDirectionalArrowLength(3.0)
       .linkDirectionalArrowRelPos(0.5)
-      .backgroundColor(colors.slate[200]);
+      .linkAutoColorBy(() => colors.white)
+      .backgroundColor(colors.blackDenim);
     axios.get(`${url}/${superNodeTitle}`).then((res) => {
       switch (res.status) {
         case 200:
@@ -66,15 +67,17 @@ export default function Graph() {
       .nodeCanvasObject((nodeObject, ctx, globalScale) => {
         let node = nodeObject as Node;
         const fontSize = graphRef.current!.zoom() * 4 / globalScale;
-        const bckgColor = colors.white;
-        const ringColor = colors.neutral[node === hover ? 400 : 300];
-        node.__bckgRadius = 2 + ctx.measureText(node.title).width / 2;
-        paintRing(node, ringColor, ctx, node.__bckgRadius + 0.4);
+        const bckgColor = colors.slate[700];
+        ctx.shadowColor = colors.nearWhite;
+        ctx.shadowBlur = 20;
+        node.__bckgRadius = Math.max(ctx.measureText(node.title).width / 2 + 2, 12);
         paintRing(node, bckgColor, ctx, node.__bckgRadius);
         ctx.font = `${fontSize}px Sans-Serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = colors.orange[600];
+        ctx.fillStyle = colors.nearWhite;
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = colors.nearWhite;
         ctx.fillText(node.title, node.x!, node.y!);
       })
       .onNodeHover((nodeObject) => { setHover(nodeObject); })
@@ -86,7 +89,7 @@ export default function Graph() {
   }, [graphRef, graphData]);
 
   return (
-    <div>
+    <div className="bg-black">
       <TopBar />
       <BottomBar />
       <div id="graph" className="h-screen w-screen" />

@@ -45,7 +45,7 @@ export default function NodeForm() {
       className="absolute top-0 left-0 h-screen w-screen z-10
         flex items-center justify-center
         bg-neutral-800 bg-opacity-80">
-      <div className="card bg-white"
+      <div className="card bg-black-denim"
         onClick={(event) => { event.stopPropagation(); }}>
         {{
           409: <p className="text-red-500"

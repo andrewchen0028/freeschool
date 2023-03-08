@@ -66,7 +66,6 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
   const loadComments = useCallback(() => {
     if (focusNodeTitle && type === "resource") {
       axios.get(`${url}/${focusNodeTitle}/${item.id}/comments`).then((response) => {
-        console.log("Response: ", response);
         // Map comment ids to comment data
         const comments = new Map<number, FrontendResourceComment>();
         for (const comment of response.data) {

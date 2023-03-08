@@ -10,14 +10,31 @@
   h5 { @apply text-lg }
   h6 { @apply text-base }
   p { @apply text-sm }
+  html { @apply text-near-white }
+
 }
 
 @layer components {
-  .card { @apply m-2 p-2 border rounded }
-  .button { @apply card p-2 bg-white hover:bg-neutral-100 active:bg-neutral-200 }
+  .card { @apply m-4 p-2 border rounded }
+  .button { @apply 
+    card 
+    py-2 px-4
+    border-near-white
+    bg-slate-800 hover:bg-slate-700 active:bg-slate-600 
+  }
   .vote { @apply font-mono font-extrabold px-2
-    text-neutral-600 hover:bg-neutral-100 active:bg-neutral-200
+    text-neutral-600 hover:bg-slate-700 active:bg-slate-600
   }
   .upvote { @apply vote hover:text-orange-600 active:text-orange-600 }
   .downvote { @apply vote hover:text-blue-500 active:text-indigo-400 }
+}
+
+@layer utilities {
+  /* Scrollbar color */
+  .scrollbar::-webkit-scrollbar {
+    @apply w-6
+  }
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-xl
+  }
 }
