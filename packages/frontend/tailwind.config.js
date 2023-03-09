@@ -13,6 +13,9 @@ module.exports = {
       },
       dropShadow: {
         'sm': '0 0 2px rgba(255, 255, 255, 255)'
+      },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif']
       }
     },
   },

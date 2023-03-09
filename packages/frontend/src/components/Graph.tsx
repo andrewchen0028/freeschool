@@ -57,31 +57,38 @@ export default function Graph() {
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
-    graphRef.current!
-      .onNodeClick((nodeObject) => {
-        navigate(`/${superNodeTitle}/${(nodeObject as Node).title}`);
-      })
-      .nodePointerAreaPaint((nodeObject, color, ctx) => {
-        paintRing(nodeObject, color, ctx, (nodeObject as Node).__bckgRadius!);
-      })
-      .nodeCanvasObject((nodeObject, ctx, globalScale) => {
-        let node = nodeObject as Node;
-        const fontSize = graphRef.current!.zoom() * 4 / globalScale;
-        const bckgColor = colors.slate[700];
-        ctx.shadowColor = colors.nearWhite;
-        ctx.shadowBlur = 20;
-        node.__bckgRadius = Math.max(ctx.measureText(node.title).width / 2 + 2, 12);
-        paintRing(node, bckgColor, ctx, node.__bckgRadius);
-        ctx.font = `${fontSize}px Sans-Serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = colors.nearWhite;
-        ctx.shadowBlur = 0;
-        ctx.shadowColor = colors.nearWhite;
-        ctx.fillText(node.title, node.x!, node.y!);
-      })
-      .onNodeHover((nodeObject) => { setHover(nodeObject); })
-      .onNodeRightClick((nodeObject) => { navigate(`/${(nodeObject as Node).title}`); });
+    let roboto = new FontFace(
+      "Roboto",
+      "url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCBc4AMP6lbBP.woff2)"
+    );
+    roboto.load().then((font) => {
+      document.fonts.add(font);
+      graphRef.current!
+        .onNodeClick((nodeObject) => {
+          navigate(`/${superNodeTitle}/${(nodeObject as Node).title}`);
+        })
+        .nodePointerAreaPaint((nodeObject, color, ctx) => {
+          paintRing(nodeObject, color, ctx, (nodeObject as Node).__bckgRadius!);
+        })
+        .nodeCanvasObject((nodeObject, ctx, globalScale) => {
+          let node = nodeObject as Node;
+          const bckgColor = colors.slate[700];
+          ctx.shadowColor = colors.nearWhite;
+          ctx.shadowBlur = 20;
+          node.__bckgRadius = Math.max(ctx.measureText(node.title).width / 2 + 2, 12);
+          paintRing(node, bckgColor, ctx, node.__bckgRadius);
+          const fontSize = graphRef.current!.zoom() * 4 / globalScale;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = colors.nearWhite;
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = colors.nearWhite;
+          ctx.font = `${fontSize}px Roboto`;
+          ctx.fillText(node.title, node.x!, node.y!);
+        })
+        .onNodeHover((nodeObject) => { setHover(nodeObject); })
+        .onNodeRightClick((nodeObject) => { navigate(`/${(nodeObject as Node).title}`); });
+    })
   }, [graphRef, superNodeTitle, hover, paintRing, navigate]);
 
   useEffect(function redrawGraph() {
