@@ -91,7 +91,7 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
           if (addedCommentIds.has(commentId)) return;
           addedCommentIds.add(commentId);
           newCommentCards.push(
-            <div className="border-l-2 p-2 py-0.5 items-center" key={commentId} style={{ marginLeft: `${nestingLayer}em` }}>
+            <div className="border-l border-gray-500 p-2 py-0.5 items-center" key={commentId} style={{ marginLeft: `${nestingLayer}em` }}>
               {commentData.text}
               <div className="flex pb-1 flex items-center gap-2">
                 <button className="downvote p-0" onClick={() => {  }}>-</button>

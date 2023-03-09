@@ -47,7 +47,7 @@ export function InlinkForm({ reload, addLink }: {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Source Node" required={true}
+        <input className="text-input" placeholder="Source Node" required={true}
           value={sourceNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
@@ -97,7 +97,7 @@ export function OutlinkForm({ reload, addLink }: {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Target Node" required={true}
+        <input className="text-input" placeholder="Target Node" required={true}
           value={targetNodeTitle} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>
@@ -142,7 +142,7 @@ export function ResourceForm({ reload }: { reload: () => void }) {
         }[errorFlag]
       }
       <form onSubmit={handleSubmit}>
-        <input className="card" placeholder="Title" required={true}
+        <input className="text-input" placeholder="Title" required={true}
           type={"url"} value={stagedResourceUrl} onChange={handleChange} />
         <button className="button" type="submit">Submit</button>
       </form>

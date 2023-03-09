@@ -57,8 +57,8 @@ function ItemListSelectors({ setItemType }: {
     <div className="card flex gap-2">
       {/* TODO-low: implement sorted ItemLists */}
       <div>
-        <label htmlFor="sortmode">Sort: </label>
-        <select name="sortmode" id="sortmode">
+        <label htmlFor="sortmode">Sort by: </label>
+        <select className="pr-1" name="sortmode" id="sortmode">
           <option defaultChecked value="best">Best</option>
           <option value="top">Top</option>
           <option value="new">New</option>
@@ -67,7 +67,7 @@ function ItemListSelectors({ setItemType }: {
 
       <div>
         <label htmlFor="itemtype">View: </label>
-        <select name="itemtype" id="itemtype"
+        <select className="pr-1" name="itemtype" id="itemtype"
           onChange={(event) => { setItemType(`${event.target.value}`); }}>
           <option value="resources">Resources</option>
           <option value="inlinks">Inlinks</option>

@@ -54,7 +54,7 @@ export default function NodeForm() {
             children="Internal server error" />
         }[errorFlag]}
         <form onSubmit={handleSubmit}>
-          <input className="card" placeholder="Node Title" required={true}
+          <input className="text-input" placeholder="Node Title" required={true}
             value={title} onChange={handleChange} />
           <button className="button" type="submit">Submit</button>
         </form>

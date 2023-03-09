@@ -74,7 +74,7 @@ export default function Graph() {
           let node = nodeObject as Node;
           const bckgColor = colors.slate[700];
           ctx.shadowColor = colors.nearWhite;
-          ctx.shadowBlur = 20;
+          ctx.shadowBlur = 8;
           node.__bckgRadius = Math.max(ctx.measureText(node.title).width / 2 + 2, 12);
           paintRing(node, bckgColor, ctx, node.__bckgRadius);
           const fontSize = graphRef.current!.zoom() * 4 / globalScale;
@@ -96,11 +96,11 @@ export default function Graph() {
   }, [graphRef, graphData]);
 
   return (
-    <div className="bg-black">
+    <div className="bg-black-denim z-0">
+      <div id="graph" className="h-screen w-screen pt-16 overflow-hidden" />
+      <Outlet context={[addNode, addLink]} />
       <TopBar />
       <BottomBar />
-      <div id="graph" className="h-screen w-screen" />
-      <Outlet context={[addNode, addLink]} />
     </div>
   );
 }

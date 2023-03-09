@@ -10,9 +10,10 @@ module.exports = {
         'near-white': '#e6e6f1',
         'slate-800': '#1e293b',
         'slate-700': '#334155',
+        'gray-500': '#6b7280',
       },
       dropShadow: {
-        'sm': '0 0 2px rgba(255, 255, 255, 255)'
+        'lg': '0 0 8px near-white'
       },
       fontFamily: {
         sans: ['Roboto', 'sans-serif']

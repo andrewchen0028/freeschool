@@ -44,7 +44,7 @@ export default function UserForm() {
         onClick={(event) => { event.stopPropagation(); }}>
         <form onSubmit={handleSubmit} className="flex flex-row">
           <div className="flex flex-col">
-            <input id="username" className="card"
+            <input id="username" className="text-input"
               placeholder="Username" required={true}
               value={username} onChange={handleUsernameChange} />
             <label htmlFor="username" className="text-red-500"
@@ -56,7 +56,7 @@ export default function UserForm() {
                 || <p>{`Unrecognized HTTP response: ${errorFlag}`}</p>} />
           </div>
           <div className="flex flex-col">
-            <input className="card" placeholder="Password" required={true}
+            <input className="text-input" placeholder="Password" required={true}
               value={password} onChange={handlePasswordChange} />
           </div>
           <button className="button" type="submit" children="Submit" />
