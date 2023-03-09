@@ -13,7 +13,7 @@ module.exports = {
         'gray-500': '#6b7280',
       },
       dropShadow: {
-        'lg': '0 0 8px near-white'
+        'lg': '0 0 32px #e6e6f1'
       },
       fontFamily: {
         sans: ['Roboto', 'sans-serif']

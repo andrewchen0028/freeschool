@@ -53,7 +53,10 @@ export default function NodeForm() {
           500: <p className="text-red-500"
             children="Internal server error" />
         }[errorFlag]}
-        <form onSubmit={handleSubmit}>
+        <div className="px-4 pt-2 text-xl">
+          Create node
+        </div>
+        <form onSubmit={handleSubmit} className="mt-0">
           <input className="text-input" placeholder="Node Title" required={true}
             value={title} onChange={handleChange} />
           <button className="button" type="submit">Submit</button>

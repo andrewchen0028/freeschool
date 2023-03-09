@@ -96,11 +96,11 @@ export default function Graph() {
   }, [graphRef, graphData]);
 
   return (
-    <div className="bg-black-denim z-0">
-      <div id="graph" className="h-screen w-screen pt-16 overflow-hidden" />
+    <div className="bg-black-denim z-1">
       <Outlet context={[addNode, addLink]} />
-      <TopBar />
       <BottomBar />
+      <div id="graph" className="h-screen w-screen pt-20 overflow-hidden z-1" />
+      <TopBar />
     </div>
   );
 }

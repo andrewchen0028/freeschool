@@ -88,17 +88,17 @@ export default function NodeWindow() {
 
   return (focusNodeTitle
     ? <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
-      <NodeWindowSideBar />
-      <div className="w-4/5 bg-black-denim overflow-y-scroll scrollbar">
-        <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
-        <ItemListSelectors setItemType={setItemType} />
-        {{
-          "resources": <ResourceList focusNodeTitle={focusNodeTitle} />,
-          "inlinks": <InlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />,
-          "outlinks": <OutlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />
-        }[itemType]}
-      </div>
-      <NodeWindowSideBar />
+        <NodeWindowSideBar />
+        <div className="w-4/5 bg-black-denim overflow-y-scroll scrollbar">
+          <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
+          <ItemListSelectors setItemType={setItemType} />
+          {{
+            "resources": <ResourceList focusNodeTitle={focusNodeTitle} />,
+            "inlinks": <InlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />,
+            "outlinks": <OutlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />
+          }[itemType]}
+        </div>
+        <NodeWindowSideBar />
     </div>
     : <div children={"Error: opened NodeWindow but focusNodeTitle was undefined"} />
   );

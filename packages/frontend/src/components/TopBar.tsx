@@ -36,17 +36,17 @@ export default function TopBar() {
     if (graphTitles.length < 2) return <></>;
     else {
       return <button onClick={() => popSubgraph()} className="text-sm text-blue-600 underline">
-        Previous subgraph: {graphTitles.at(-2)}
+        Previous graph: {graphTitles.at(-2)}
       </button>
     }
   }
 
   return (
-    <div className="absolute top-0 left-0 h-16 w-screen drop-shadow-lg min-h-max
-      flex flex-row justify-between align-center z-100">
+    <div className="absolute top-0 left-0 h-20 w-screen drop-shadow-lg
+      flex flex-row justify-between align-center z-2 bg-black-denim">
       <div className="h-100% flex flex-col items-start">
         <div className="h-100%
-        flex flex-row items-center">
+        flex flex-row items-center my-auto">
           <div className="z-10 ml-10 w-40">
             <label htmlFor="range" className="text-sm">Minimum node score: 30</label>
             <input id="range" type="range" min={-100} max={100} className="w-full bg-gray" />
@@ -56,7 +56,7 @@ export default function TopBar() {
             children="Create Account" />
         </div>
       </div>
-      <div className="flex flex-col z-10 p-2 mr-10 h-100% w-100% items-end">
+      <div className="flex flex-col z-10 my-auto mr-10 h-100% w-100% items-end">
         <div className="text-sm my-auto">
           Currently viewing {graphTitles.at(-1)} graph
         </div>
