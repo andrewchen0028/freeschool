@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Graph from './components/Graph';
 import NodeForm from './components/NodeForm';
 import NodeWindow from './components/NodeWindow';
+import CreateAccount from './components/CreateAccount';
 
 import "./index.css";
 
@@ -16,6 +17,7 @@ root.render(
       <Route path=":superNodeTitle" element={<Graph />}>
         <Route path=":focusNodeTitle" element={<NodeWindow />} />
         <Route path="createNode" element={<NodeForm />} />
+        <Route path="createAccount" element={<CreateAccount />} />
       </Route>
     </Routes>
   </BrowserRouter>

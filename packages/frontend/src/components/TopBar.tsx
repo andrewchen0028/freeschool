@@ -52,7 +52,7 @@ export default function TopBar() {
             <input id="range" type="range" min={-100} max={100} className="w-full bg-gray" />
           </div>
           <button className="button z-10"
-            onClick={() => { navigate(`createUser`); }}
+            onClick={() => { navigate(`createAccount`); }}
             children="Create Account" />
         </div>
       </div>
