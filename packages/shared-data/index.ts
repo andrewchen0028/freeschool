@@ -8,3 +8,8 @@ export interface Node extends NodeObject {
 export interface Link extends LinkObject {
   id?: number;
 }
+
+export interface User {
+  id: number,
+  username: string,
+}

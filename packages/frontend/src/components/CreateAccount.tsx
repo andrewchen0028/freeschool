@@ -24,7 +24,7 @@ export default function CreateAccount() {
     function handleSubmit(event: any) {
         event.preventDefault();
 
-        axios.post(`${url}/users/`, {
+        axios.post(`${url}/createAccount`, {
             username: username,
             password: password
         }).then((response) => {
@@ -59,12 +59,12 @@ export default function CreateAccount() {
                         value={password} onChange={handlePasswordChange} />
                     <button className="button" type="submit" children="Create Account" />
                 </form>
-                <button className="button w-48" children="(dev) log users"
+                {/* <button className="button w-48" children="(dev) log users"
                     onClick={() => {
                         axios.get(`${url}/users/`).then((response) => {
                             console.log(response.data);
                         });
-                    }} />
+                    }} /> */}
             </div>
         </div>
     );

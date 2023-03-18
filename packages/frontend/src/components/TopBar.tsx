@@ -1,4 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useContext } from 'react';
+import { UserContext } from "./UserContext";
 import axios from "axios";
 
 // import url from "..";
@@ -6,6 +8,7 @@ import { useEffect, useState } from "react";
 
 export default function TopBar() {
   const navigate = useNavigate();
+  const {user, setUser} = useContext(UserContext);
 
   // Track the titles of the subgraphs we've visited
   const [graphTitles, setGraphTitles] = useState<string[]>([]);
@@ -22,6 +25,43 @@ export default function TopBar() {
       setGraphTitles(newGraphTitles);
     }
   }, [params]);
+
+  function LoggedInText() {
+    return (
+      <div className="z-10 ml-10 max-w-32">
+        {user.id === -1 ? "Not logged in" : `Logged in as ${user.username}`}
+      </div>
+    );
+  }
+  function LoginButton() {
+    if (user.id === -1) return (
+      <button className="button z-10"
+        onClick={() => { navigate(`logIn`); }}
+        children="Log In" />
+    );
+    else return (<></>)
+  }
+  function LogoutButton() {
+    if (user.id !== -1) return (
+      <button className="button z-10"
+        onClick={() => {
+          setUser({
+            id: -1,
+            username: ""
+          })
+        }}
+        children="Log Out" />
+    );
+    else return (<></>)
+  }
+  function CreateAccountButton() {
+    if (user.id === -1) return (
+      <button className="button ml-0 z-10"
+        onClick={() => { navigate(`createAccount`); }}
+        children="Create Account" />
+    );
+    else return (<></>)
+  }
 
   function popSubgraph() {
     if (graphTitles.length < 2) {
@@ -47,13 +87,10 @@ export default function TopBar() {
       <div className="h-100% flex flex-col items-start">
         <div className="h-100%
         flex flex-row items-center my-auto">
-          <div className="z-10 ml-10 w-40">
-            <label htmlFor="range" className="text-sm">Minimum node score: 30</label>
-            <input id="range" type="range" min={-100} max={100} className="w-full bg-gray" />
-          </div>
-          <button className="button z-10"
-            onClick={() => { navigate(`createAccount`); }}
-            children="Create Account" />
+          <LoggedInText />
+          <LogoutButton />
+          <LoginButton />
+          <CreateAccountButton />
         </div>
       </div>
       <div className="flex flex-col z-10 my-auto mr-10 h-100% w-100% items-end">

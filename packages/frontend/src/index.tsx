@@ -5,8 +5,8 @@ import Graph from './components/Graph';
 import NodeForm from './components/NodeForm';
 import NodeWindow from './components/NodeWindow';
 import CreateAccount from './components/CreateAccount';
-
 import "./index.css";
+import LogIn from './components/LogIn';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -18,6 +18,7 @@ root.render(
         <Route path=":focusNodeTitle" element={<NodeWindow />} />
         <Route path="createNode" element={<NodeForm />} />
         <Route path="createAccount" element={<CreateAccount />} />
+        <Route path="logIn" element={<LogIn />} />
       </Route>
     </Routes>
   </BrowserRouter>

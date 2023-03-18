@@ -1,13 +1,14 @@
 import axios from "axios";
 import ForceGraph, { ForceGraphInstance, GraphData, LinkObject, NodeObject } from "force-graph";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useContext } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import { url } from "..";
 import colors from "../colors";
 import TopBar from "./TopBar";
 import BottomBar from "./BottomBar";
-import { Node } from "shared-data";
+import { Node, User } from "shared-data";
+import { UserContext } from "./UserContext";
 
 // TODO-low: make graph react to window size changes.
 export default function Graph() {
@@ -17,6 +18,7 @@ export default function Graph() {
   const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
   const { superNodeTitle } = useParams();
+  const [user, setUser] = useState<User>({id: -1, username: ""});
 
   const paintRing = useCallback((node: NodeObject, color: string,
     ctx: CanvasRenderingContext2D, radius: number) => {
@@ -57,11 +59,11 @@ export default function Graph() {
   // TODO-low: implement interactive grid background
   //       (see https://github.com/vasturiano/react-force-graph/issues/321)
   useEffect(function initializeGraph() {
-    let roboto = new FontFace(
+    let robotoThin = new FontFace(
       "Roboto",
-      "url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCBc4AMP6lbBP.woff2)"
+      "url(https://fonts.gstatic.com/s/roboto/v30/KFOkCnqEu92Fr1MmgVxFIzIXKMnyrYk.woff2)",
     );
-    roboto.load().then((font) => {
+    robotoThin.load().then((font) => {
       document.fonts.add(font);
       graphRef.current!
         .onNodeClick((nodeObject) => {
@@ -97,10 +99,16 @@ export default function Graph() {
 
   return (
     <div className="bg-black-denim z-1">
-      <Outlet context={[addNode, addLink]} />
-      <BottomBar />
-      <div id="graph" className="h-screen w-screen pt-20 overflow-hidden z-1" />
-      <TopBar />
+      <UserContext.Provider value={{user}}>
+        <Outlet context={[addNode, addLink]} />
+        <BottomBar />
+        <div id="graph" className="h-screen w-screen pt-20 overflow-hidden z-1" />
+        <UserContext.Consumer>
+            {({user}) => {
+              <TopBar user={user}/>
+            }}
+        </UserContext.Consumer>
+      </UserContext.Provider>
     </div>
   );
 }

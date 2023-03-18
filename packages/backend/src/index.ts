@@ -281,7 +281,7 @@ app.post("/:nodeTitle/outlink", function postOutlink(req, res) {
   });
 });
 
-app.post('/user', async (req, res) => {
+app.post('/createAccount', async (req, res) => {
   const { username, password } = req.body;
 
   const saltRounds = 10;
@@ -302,6 +302,24 @@ app.post('/user', async (req, res) => {
         return res.status(500).end();
     }
   });
+});
+
+app.post('/logIn', async (req, res) => {
+  const { username, password } = req.body;
+
+  User.findFirstOrThrow({
+    where: { username: username }
+  }).then((user) => {
+    bcrypt.compare(password, user.passwordHash).then((val) => {
+      if (val) return res.json(user).status(201).end();
+      else {
+        return res.status(401).end();
+      }
+    });
+  }).catch((error) => {
+    return res.status(401).end();
+  })
+
 });
 
 
