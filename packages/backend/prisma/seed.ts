@@ -37,11 +37,11 @@ async function main() {
   });
   await Resource.createMany({
     data: [
-      { id: 0, nodeId: 999991, url: "https://www.fbi.gov" },
-      { id: 1, nodeId: 999992, url: "https://www.atf.gov" },
-      { id: 2, nodeId: 999993, url: "https://www.nsa.gov" },
-      { id: 3, nodeId: 999994, url: "https://www.cia.gov" },
-      { id: 5, nodeId: 999991, url: "https://www.dhs.gov" },
+      { id: 0, nodeId: 999991, url: "3blue1brown Calculus 1 https://www.youtube.com/watch?v=WUvTyaaNkzM" },
+      { id: 1, nodeId: 999992, url: "Professor Leonard https://www.youtube.com/watch?v=H9eCT6f_Ftw&list=PLDesaqWTN6EQ2J4vgsN1HyBeRADEh4Cw-" },
+      { id: 2, nodeId: 999993, url: "OChem Tutor on youtube https://www.youtube.com/watch?v=WT7oxiiFYt8" },
+      { id: 3, nodeId: 999994, url: "Khan academy vid https://www.youtube.com/watch?v=riXcZT2ICjA" },
+      { id: 5, nodeId: 999991, url: "freecodecamp calc 1 https://www.youtube.com/watch?v=HfACrKJ_Y2w&t=2s" },
     ]
   });
   await ResourceComment.createMany({
