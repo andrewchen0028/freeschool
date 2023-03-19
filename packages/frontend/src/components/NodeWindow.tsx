@@ -31,12 +31,11 @@ function NodeWindowHeader({ focusNodeTitle }: { focusNodeTitle: string }) {
   useEffect(reload, [focusNodeTitle]);
 
   return (nodeMetadata ?
-    <div className="flex items-center gap-2 text-xl">
+    <div className="flex items-center gap-2 text-xl pt-4">
       {/* VOTE BUTTONS */}
-      <div className="p-2 flex flex-col items-center">
-        <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
+      <div className="p-2 flex flex-row items-center">
         <h2>{nodeMetadata.score}</h2>
-        <button className="downvote" onClick={() => { vote("downvote") }}>—</button>
+        <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
       </div>
 
       {/* TITLE */}
@@ -88,17 +87,17 @@ export default function NodeWindow() {
 
   return (focusNodeTitle
     ? <div className="absolute top-0 left-0 h-screen w-screen z-10 flex">
-        <NodeWindowSideBar />
-        <div className="w-4/5 bg-black-denim overflow-y-scroll scrollbar">
-          <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
-          <ItemListSelectors setItemType={setItemType} />
-          {{
-            "resources": <ResourceList focusNodeTitle={focusNodeTitle} />,
-            "inlinks": <InlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />,
-            "outlinks": <OutlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />
-          }[itemType]}
-        </div>
-        <NodeWindowSideBar />
+      <NodeWindowSideBar />
+      <div className="w-4/5 bg-black-denim overflow-y-scroll scrollbar">
+        <NodeWindowHeader focusNodeTitle={focusNodeTitle} />
+        <ItemListSelectors setItemType={setItemType} />
+        {{
+          "resources": <ResourceList focusNodeTitle={focusNodeTitle} />,
+          "inlinks": <InlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />,
+          "outlinks": <OutlinkList addLink={addLink} focusNodeTitle={focusNodeTitle} />
+        }[itemType]}
+      </div>
+      <NodeWindowSideBar />
     </div>
     : <div children={"Error: opened NodeWindow but focusNodeTitle was undefined"} />
   );

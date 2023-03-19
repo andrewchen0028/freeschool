@@ -54,7 +54,7 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
       </>) :
       (<></>);
   }
-  
+
   // ResourceComment type which only contains the information needed on frontned: text, score, children
   type FrontendResourceComment = {
     text: string;
@@ -62,7 +62,7 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
     childrenIds: Set<number>;
   };
 
-  const [commentCards, setCommentCards]= useState<JSX.Element[]>([]);
+  const [commentCards, setCommentCards] = useState<JSX.Element[]>([]);
   const loadComments = useCallback(() => {
     if (focusNodeTitle && type === "resource") {
       axios.get(`${url}/${focusNodeTitle}/${item.id}/comments`).then((response) => {
@@ -94,9 +94,8 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
             <div className="border-l border-gray-500 p-2 py-0.5 items-center" key={commentId} style={{ marginLeft: `${nestingLayer}em` }}>
               {commentData.text}
               <div className="flex pb-1 flex items-center gap-2">
-                <button className="downvote p-0" onClick={() => {  }}>-</button>
                 <h6>{comments.get(commentId)!.score}</h6>
-                <button className="upvote p-0" onClick={() => {  }}>+</button>
+                <button className="upvote p-0" onClick={() => { }}>+</button>
               </div>
             </div>
           )
@@ -120,10 +119,9 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
       <div className="card z-10 mb-0">
         <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row items-center">
-            <div className="flex flex-col items-center">
-              <button className="upvote" onClick={() => { }}>+</button>
+            <div className="flex flex-row items-center">
               <h4>0</h4>
-              <button className="downvote" onClick={() => { }}>—</button>
+              <button className="upvote" onClick={() => { }}>+</button>
             </div>
             <div className="px-4">
               {CardBody}
@@ -134,7 +132,7 @@ export function Card({ item, type }: { item: Resource | Node, type: string }) {
             Add Comment
           </button>
         </div>
-        <CommentInput/>
+        <CommentInput />
       </div>
       <div className="card mt-0 border-t-0">
         Comments:

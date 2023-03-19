@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
+
+import { UserContext } from './UserContext';
 
 import axios from "axios";
 import { url } from "..";
+import { Client, auth } from "alby-js-sdk";
+import { requestProvider } from "webln";
 
 export default function CreateAccount() {
     const [username, setUsername] = useState("");
@@ -10,6 +14,7 @@ export default function CreateAccount() {
     const [errorFlag, setErrorFlag] = useState(0);
 
     const navigate = useNavigate();
+    const { userContext } = useContext(UserContext);
 
     function handleUsernameChange(event: any) {
         setUsername(event.target.value);

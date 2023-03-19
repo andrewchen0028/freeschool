@@ -58,6 +58,12 @@ async function main() {
       { superId: 999991, subId: 999994 },
     ]
   });
+
+  await User.create({
+    data: {
+      pubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62"
+    }
+  })
 }
 
 main().then(async () => {

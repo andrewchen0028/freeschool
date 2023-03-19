@@ -13,7 +13,7 @@ export default function LogIn() {
     const [errorFlag, setErrorFlag] = useState(0);
 
     const navigate = useNavigate();
-    const { user } = useContext(UserContext);
+    const { userContext } = useContext(UserContext);
 
     function handleUsernameChange(event: any) {
         setUsername(event.target.value);
@@ -32,8 +32,8 @@ export default function LogIn() {
             username: username,
             password: password
         }).then((response) => {
-            user.id = response.data.id;
-            user.username = response.data.username;
+            userContext.user.id = response.data.id;
+            userContext.user.username = response.data.username;
             navigate("/");
         }).catch((error) => {
             setErrorFlag(error.response.status);

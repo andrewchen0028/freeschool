@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import cors from "cors";
 import express from "express";
+
 import { PrismaClient } from '@prisma/client';
 import type { Node } from '@prisma/client';
 
@@ -281,43 +282,62 @@ app.post("/:nodeTitle/outlink", function postOutlink(req, res) {
   });
 });
 
-app.post('/createAccount', async (req, res) => {
-  const { username, password } = req.body;
+// app.post('/createAccount', async (req, res) => {
+//   const { username, password } = req.body;
 
-  const saltRounds = 10;
-  const passwordHash = await bcrypt.hash(password, saltRounds);
+//   const saltRounds = 10;
+//   const passwordHash = await bcrypt.hash(password, saltRounds);
 
-  User.create({
-    data: { username: username, passwordHash: passwordHash }
-  }).then((user) => {
-    return res.json(user).status(201).end();
-  }).catch((error) => {
-    console.log(typeof (error));
-    switch (error.code) {
-      case "P2002":
-        console.warn(`Attempted to add duplicate username: ${username}`);
-        return res.status(409).end();
-      default:
-        console.warn(`Failed to add user: ${error}`);
-        return res.status(500).end();
-    }
-  });
-});
+//   User.create({
+//     data: { username: username, passwordHash: passwordHash }
+//   }).then((user) => {
+//     return res.json(user).status(201).end();
+//   }).catch((error) => {
+//     console.log(typeof (error));
+//     switch (error.code) {
+//       case "P2002":
+//         console.warn(`Attempted to add duplicate username: ${username}`);
+//         return res.status(409).end();
+//       default:
+//         console.warn(`Failed to add user: ${error}`);
+//         return res.status(500).end();
+//     }
+//   });
+// });
 
+// app.post('/logIn', async (req, res) => {
+//   const { username, password } = req.body;
+
+//   User.findFirstOrThrow({
+//     where: { username: username }
+//   }).then((user) => {
+//     bcrypt.compare(password, user.passwordHash).then((val) => {
+//       if (val) return res.json(user).status(201).end();
+//       else {
+//         return res.status(401).end();
+//       }
+//     });
+//   }).catch((error) => {
+//     return res.status(401).end();
+//   })
+
+// });
+
+// Creates a new entry in the database if the given pubkey was not found
 app.post('/logIn', async (req, res) => {
-  const { username, password } = req.body;
-
-  User.findFirstOrThrow({
-    where: { username: username }
-  }).then((user) => {
-    bcrypt.compare(password, user.passwordHash).then((val) => {
-      if (val) return res.json(user).status(201).end();
-      else {
-        return res.status(401).end();
-      }
-    });
-  }).catch((error) => {
-    return res.status(401).end();
+  const { pubkey } = req.body;
+  User.count({
+    where: { pubkey: pubkey }
+  }).then((num) => {
+    if (num == 0) {
+      User.create({
+        data: {
+          pubkey: pubkey
+        }
+      }).then((user) => {
+        return res.json(user).status(201).end();
+      })
+    }
   })
 
 });
