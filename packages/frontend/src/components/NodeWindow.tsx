@@ -22,16 +22,21 @@ function NodeWindowHeader({ focusNodeTitle }: { focusNodeTitle: string }) {
   const { userContext } = useContext(UserContext);
 
   function vote() {
-    axios.post(`${url}/${focusNodeTitle}/upvote`).then(reload);
+    console.log(nodeMetadata);
+    console.log(nodeUpvoted);
+    if (nodeMetadata && !nodeUpvoted) {
+      axios.post(`${url}/${nodeMetadata.id}/upvote/${userContext.nodePubkey}`).then(reload);
+    }
   }
 
   function reload() {
     axios.get(`${url}/${focusNodeTitle}/node/${userContext.nodePubkey}`).then((response) => {
-      setNodeMetadata(response.data);
+      setNodeMetadata(response.data.node);
+      setNodeUpvoted(response.data.upvoted);
     });
   }
 
-  useEffect(reload, [focusNodeTitle]);
+  useEffect(reload, [focusNodeTitle, userContext.nodePubkey]);
 
   return (nodeMetadata ?
     <div className="flex items-center gap-2 text-xl pt-4">

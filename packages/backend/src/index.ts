@@ -57,10 +57,22 @@ app.get("/:nodeTitle/node/:nodePubkey", function getNodeData(req, res) {
     where: { title: req.params.nodeTitle },
     include: { upvoters: true }
   }).then((node) => {
+    console.log(node?.upvoters);
     if (node?.upvoters.find((user) => user.pubkey === req.params.nodePubkey))
       return res.json({ node: node, upvoted: true }).status(200).end();
     else
       return res.json({ node: node, upvoted: false }).status(200).end();
+  }).catch((error) => {
+    console.warn(`Failed to get node: ${error}`);
+    return res.status(500).end();
+  });
+});
+app.get("/:nodeTitle/node/", function getNodeData(req, res) {
+  Node.findUnique({
+    where: { title: req.params.nodeTitle },
+    include: { upvoters: true }
+  }).then((node) => {
+    return res.json({ node: node, upvoted: true }).status(200).end();
   }).catch((error) => {
     console.warn(`Failed to get node: ${error}`);
     return res.status(500).end();
@@ -171,9 +183,11 @@ app.post("/node", async function postNode(req, res) {
 });
 
 // fucked
-app.post("/:nodeId/upvote", function postNodeVote(req, res) {
+app.post("/:nodeId/upvote/:pubkey", async function postNodeVote(req, res) {
+  let upvoters = (await Node.findUnique({ where: { id: parseInt(req.params.nodeId) }, include: { upvoters: true } }))?.upvoters;
+  let newUpvoter = (await User.findUnique({ where: { pubkey: req.params.pubkey}}))!;
   Node.update({
-    data: { score: { increment: 1 } },
+    data: { score: { increment: 1 }, upvoters: { set: [...<[]>upvoters, newUpvoter] } },
     where: { id: parseInt(req.params.nodeId) }
   }).then(() => { return res.status(200).end(); });
 });
