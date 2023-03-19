@@ -1,9 +1,10 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { InlinkList, OutlinkList, ResourceList } from "./ItemList";
 import { url } from "..";
 
+import { UserContext } from "./UserContext";
 import { Node } from "@prisma/client";
 import { addLinkFunction } from "./Graph";
 
@@ -17,13 +18,15 @@ function NodeWindowSideBar() {
 
 function NodeWindowHeader({ focusNodeTitle }: { focusNodeTitle: string }) {
   const [nodeMetadata, setNodeMetadata] = useState<Node | undefined>();
+  const [nodeUpvoted, setNodeUpvoted] = useState<boolean>(true);
+  const { userContext } = useContext(UserContext);
 
-  function vote(type: string) {
-    axios.post(`${url}/${focusNodeTitle}/vote/${type}`).then(reload);
+  function vote() {
+    axios.post(`${url}/${focusNodeTitle}/upvote`).then(reload);
   }
 
   function reload() {
-    axios.get(`${url}/${focusNodeTitle}/node`).then((response) => {
+    axios.get(`${url}/${focusNodeTitle}/node/${userContext.nodePubkey}`).then((response) => {
       setNodeMetadata(response.data);
     });
   }
@@ -35,7 +38,7 @@ function NodeWindowHeader({ focusNodeTitle }: { focusNodeTitle: string }) {
       {/* VOTE BUTTONS */}
       <div className="p-2 flex flex-row items-center">
         <h2>{nodeMetadata.score}</h2>
-        <button className="upvote" onClick={() => { vote("upvote") }}>+</button>
+        <button className="upvote" onClick={() => { vote() }}>+</button>
       </div>
 
       {/* TITLE */}

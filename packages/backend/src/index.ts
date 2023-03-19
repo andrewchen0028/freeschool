@@ -52,11 +52,15 @@ app.get("/:nodeTitle", async function getGraphData(req, res) {
 });
 
 // NodeWindows
-app.get("/:nodeTitle/node", function getNodeData(req, res) {
+app.get("/:nodeTitle/node/:nodePubkey", function getNodeData(req, res) {
   Node.findUnique({
     where: { title: req.params.nodeTitle },
+    include: { upvoters: true }
   }).then((node) => {
-    return res.json(node).status(200).end();
+    if (node?.upvoters.find((user) => user.pubkey === req.params.nodePubkey))
+      return res.json({ node: node, upvoted: true }).status(200).end();
+    else
+      return res.json({ node: node, upvoted: false }).status(200).end();
   }).catch((error) => {
     console.warn(`Failed to get node: ${error}`);
     return res.status(500).end();
@@ -138,6 +142,7 @@ app.post("/node", async function postNode(req, res) {
   Node.create({
     data: {
       title: req.body.title,
+      userPubkey: req.body.author,
     }
   }).then((node) => {
     if (superNodeId !== -1) {
@@ -165,22 +170,12 @@ app.post("/node", async function postNode(req, res) {
   });
 });
 
-app.post("/:nodeId/vote/:vote", function postNodeVote(req, res) {
-  switch (req.params.vote) {
-    case "upvote":
-      Node.update({
-        data: { score: { increment: 1 } },
-        where: { id: parseInt(req.params.nodeId) }
-      }).then(() => { return res.status(200).end(); });
-    case "downvote":
-      Node.update({
-        data: { score: { decrement: 1 } },
-        where: { id: parseInt(req.params.nodeId) }
-      }).then(() => { return res.status(200).end(); });
-    default:
-      console.error("Received invalid vote");
-      return res.status(400).end();
-  }
+// fucked
+app.post("/:nodeId/upvote", function postNodeVote(req, res) {
+  Node.update({
+    data: { score: { increment: 1 } },
+    where: { id: parseInt(req.params.nodeId) }
+  }).then(() => { return res.status(200).end(); });
 });
 
 app.post("/:nodeId/resource", function postResource(req, res) {

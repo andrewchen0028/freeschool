@@ -1,16 +1,18 @@
 import axios from "axios";
 import { NodeObject } from "force-graph";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState, useContext } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { url } from "..";
 import { Node } from "shared-data";
 import { addNodeFunction } from "./Graph";
+import { UserContext } from "./UserContext";
 
 export default function NodeForm() {
   const [title, setTitle] = useState("");
   const [errorFlag, setErrorFlag] = useState(0);
 
   const { superNodeTitle } = useParams();
+  const { userContext } = useContext(UserContext);
 
   const [addNode] = useOutletContext<[addNodeFunction]>();
   const navigate = useNavigate();
@@ -23,11 +25,15 @@ export default function NodeForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     // TODO-BUGFIX: doesn't correctly handle addNode on empty subgraph
-    axios.post(`${url}/node`, { title: title, superNodeTitle: superNodeTitle }).then((response) => {
-      let node: Node = response.data;
-      addNode({ id: node.id, title: node.title } as NodeObject);
-      navigate(`../${node.title}`);
-    }).catch((error) => { setErrorFlag(error.response.status); });
+    if (userContext.nodePubkey !== "") {
+      axios.post(`${url}/node`, { title: title, superNodeTitle: superNodeTitle, author: userContext.nodePubkey }).then((response) => {
+        let node: Node = response.data;
+        addNode({ id: node.id, title: node.title } as NodeObject);
+        navigate(`../${node.title}`);
+      }).catch((error) => { setErrorFlag(error.response.status); });
+    } else {
+      console.log("Not logged in; can't post");
+    }
   }
 
   return (
