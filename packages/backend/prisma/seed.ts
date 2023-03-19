@@ -25,6 +25,9 @@ async function main() {
     data: [
       { id: 999991, title: "Calculus 1", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
       { id: 999992, title: "Calculus 2", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
+      { id: 999995, title: "Calculus 3", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
+      { id: 999996, title: "Differential Eqs", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
+      { id: 999996, title: "Topology", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
       { id: 999993, title: "Continuity", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
       { id: 999994, title: "Limits", userPubkey: "021eaf27a2cd3ac78398513479f2659edc5c6d7d520b7ae3286e88bda67950be62" },
     ]
@@ -32,7 +35,10 @@ async function main() {
   await Link.createMany({
     data: [
       { source: 999991, target: 999992 },
-      { source: 999993, target: 999994 }
+      { source: 999993, target: 999994 },
+      { source: 999992, target: 999995 },
+      { source: 999995, target: 999996 },
+      { source: 999995, target: 999997 }
     ]
   });
   await Resource.createMany({
