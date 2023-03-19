@@ -32,10 +32,8 @@ export default function LogIn() {
             username: username,
             password: password
         }).then((response) => {
-            setUser({
-                id: response.data.id,
-                username: response.data.username
-            });
+            user.id = response.data.id;
+            user.username = response.data.username;
             navigate("/");
         }).catch((error) => {
             setErrorFlag(error.response.status);

@@ -18,7 +18,7 @@ export default function Graph() {
   const graphRef = useRef<ForceGraphInstance>();
   const navigate = useNavigate();
   const { superNodeTitle } = useParams();
-  const [user, setUser] = useState<User>({id: -1, username: ""});
+  const user = useContext(UserContext);
 
   const paintRing = useCallback((node: NodeObject, color: string,
     ctx: CanvasRenderingContext2D, radius: number) => {
@@ -99,15 +99,11 @@ export default function Graph() {
 
   return (
     <div className="bg-black-denim z-1">
-      <UserContext.Provider value={{user}}>
+      <UserContext.Provider value={user}>
         <Outlet context={[addNode, addLink]} />
         <BottomBar />
         <div id="graph" className="h-screen w-screen pt-20 overflow-hidden z-1" />
-        <UserContext.Consumer>
-            {({user}) => {
-              <TopBar user={user}/>
-            }}
-        </UserContext.Consumer>
+        <TopBar />
       </UserContext.Provider>
     </div>
   );

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 export default function TopBar() {
   const navigate = useNavigate();
-  const {user, setUser} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   // Track the titles of the subgraphs we've visited
   const [graphTitles, setGraphTitles] = useState<string[]>([]);
@@ -45,10 +45,9 @@ export default function TopBar() {
     if (user.id !== -1) return (
       <button className="button z-10"
         onClick={() => {
-          setUser({
-            id: -1,
-            username: ""
-          })
+          user.id = -1;
+          user.username = "";
+          window.location.reload();
         }}
         children="Log Out" />
     );
