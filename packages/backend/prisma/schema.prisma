@@ -10,6 +10,7 @@ datasource db {
 model User {
   id           Int    @id @default(autoincrement())
   username     String @unique
+  email        String @unique
   passwordHash String
 
   @@map("users")
@@ -50,10 +51,10 @@ model Node {
 }
 
 model Resource {
-  id              Int               @id @default(autoincrement())
-  url             String            @unique @db.VarChar(255)
-  node            Node              @relation(fields: [nodeId], references: [id])
-  nodeId          Int
+  id               Int               @id @default(autoincrement())
+  url              String            @unique @db.VarChar(255)
+  node             Node              @relation(fields: [nodeId], references: [id])
+  nodeId           Int
   ResourceComments ResourceComment[]
 
   @@map("resources")

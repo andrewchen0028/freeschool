@@ -294,13 +294,13 @@ app.post("/:nodeTitle/outlink", function postOutlink(req, res) {
 });
 
 app.post('/createAccount', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
 
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash(password, saltRounds);
 
   User.create({
-    data: { username: username, passwordHash: passwordHash }
+    data: { username: username, email: email, passwordHash: passwordHash }
   }).then((user) => {
     return res.json(user).status(201).end();
   }).catch((error) => {

@@ -15,6 +15,13 @@ async function main() {
   await ResourceComment.deleteMany();
   await Resource.deleteMany();
   await Node.deleteMany();
+  await User.deleteMany();
+
+  // await User.createMany({
+  //   data: [
+  //     { id: 999991, username: "mycoal", email: "chen.michael.1116@gmail.com", passwordHash: }
+  //   ]
+  // });
 
   await Node.createMany({
     data: [

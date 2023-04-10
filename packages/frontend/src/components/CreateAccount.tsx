@@ -6,6 +6,7 @@ import { url } from "..";
 
 export default function CreateAccount() {
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorFlag, setErrorFlag] = useState(0);
 
@@ -15,7 +16,12 @@ export default function CreateAccount() {
         setUsername(event.target.value);
         setErrorFlag(0);
     }
-
+    
+    function handleEmailChange(event: any) {
+        setEmail(event.target.value);
+        setErrorFlag(0);
+    }
+    
     function handlePasswordChange(event: any) {
         setPassword(event.target.value);
         setErrorFlag(0);
@@ -26,6 +32,7 @@ export default function CreateAccount() {
 
         axios.post(`${url}/createAccount`, {
             username: username,
+            email: email,
             password: password
         }).then((response) => {
             console.log(response.data);
@@ -42,8 +49,11 @@ export default function CreateAccount() {
         bg-neutral-800 bg-opacity-80">
             <div className="card bg-black-denim flex flex-col"
                 onClick={(event) => { event.stopPropagation(); }}>
-                <form onSubmit={handleSubmit} className="flex flex-row">
-                    <input id="username" className="text-input"
+                <h3 className="mx-3 mt-4 p-2">
+                New to Freeschool? <br/> Let's get you started!
+                </h3>
+                <form onSubmit={handleSubmit} className="flex flex-col">
+                    <input id="username" className="text-input mb-0"
                         placeholder="Username" required={true}
                         value={username} onChange={handleUsernameChange} />
                     {/* TODO-high: make all errorflags default to 0,
@@ -52,6 +62,15 @@ export default function CreateAccount() {
                         children={{
                             0: <div />,
                             409: <p children="Username is taken" />,
+                            500: <p children="Internal server error" />
+                        }[errorFlag]
+                            || <p>{`Unrecognized HTTP response: ${errorFlag}`}</p>} />
+                    <input className="text-input mb-0" placeholder="Email" required={true}
+                        value={password} onChange={handleEmailChange} />
+                    <label htmlFor="email" className="text-red-500"
+                        children={{
+                            0: <div />,
+                            409: <p children="Email already in use" />,
                             500: <p children="Internal server error" />
                         }[errorFlag]
                             || <p>{`Unrecognized HTTP response: ${errorFlag}`}</p>} />
