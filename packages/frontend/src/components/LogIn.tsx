@@ -9,6 +9,7 @@ import { User } from "shared-data";
 
 export default function LogIn() {
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorFlag, setErrorFlag] = useState(0);
 
@@ -17,6 +18,11 @@ export default function LogIn() {
 
     function handleUsernameChange(event: any) {
         setUsername(event.target.value);
+        setErrorFlag(0);
+    }
+
+    function handleEmailChange(event: any) {
+        setEmail(event.target.value);
         setErrorFlag(0);
     }
 
@@ -47,10 +53,16 @@ export default function LogIn() {
         bg-neutral-800 bg-opacity-80">
             <div className="card bg-black-denim flex flex-col"
                 onClick={(event) => { event.stopPropagation(); }}>
-                <form onSubmit={handleSubmit} className="flex flex-row">
-                    <input id="username" className="text-input"
-                        placeholder="Username" required={true}
-                        value={username} onChange={handleUsernameChange} />
+                <form onSubmit={handleSubmit} className="flex flex-col">
+                    <div className="flex flex-row items-center">
+                        <input id="username" className="text-input"
+                            placeholder="Username" required={true}
+                            value={username} onChange={handleUsernameChange} />
+                        Or
+                        <input id="email" className="text-input"
+                            placeholder="Email" required={true}
+                            value={email} onChange={handleEmailChange} />
+                    </div>
                     {/* TODO-high: make all errorflags default to 0,
             and switch to label-based error handling */}
                     <label htmlFor="username" className="text-red-500"

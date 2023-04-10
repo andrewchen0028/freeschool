@@ -75,8 +75,6 @@ export default function Graph() {
         .nodeCanvasObject((nodeObject, ctx, globalScale) => {
           let node = nodeObject as Node;
           const bckgColor = colors.slate[700];
-          ctx.shadowColor = colors.nearWhite;
-          ctx.shadowBlur = 8;
           node.__bckgRadius = Math.max(ctx.measureText(node.title).width / 2 + 2, 12);
           paintRing(node, bckgColor, ctx, node.__bckgRadius);
           const fontSize = graphRef.current!.zoom() * 4 / globalScale;
