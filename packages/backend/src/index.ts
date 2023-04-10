@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { PrismaClient } from '@prisma/client';
 import type { Node } from '@prisma/client';
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,17 @@ const Resource = prisma.resource;
 const User = prisma.user;
 const Sublink = prisma.sublink;
 const ResourceComment = prisma.resourceComment;
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_API_KEY!, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false
+    }
+  }
+)
 
 // Graphs
 app.get("/:nodeTitle", async function getGraphData(req, res) {
