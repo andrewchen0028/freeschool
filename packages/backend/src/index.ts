@@ -316,11 +316,28 @@ app.post('/createAccount', async (req, res) => {
   });
 });
 
-app.post('/logIn', async (req, res) => {
+app.post('/logInUsername', async (req, res) => {
   const { username, password } = req.body;
 
   User.findFirstOrThrow({
     where: { username: username }
+  }).then((user) => {
+    bcrypt.compare(password, user.passwordHash).then((val) => {
+      if (val) return res.json(user).status(201).end();
+      else {
+        return res.status(401).end();
+      }
+    });
+  }).catch((error) => {
+    return res.status(401).end();
+  })
+
+});
+app.post('/logInEmail', async (req, res) => {
+  const { email, password } = req.body;
+
+  User.findFirstOrThrow({
+    where: { email: email }
   }).then((user) => {
     bcrypt.compare(password, user.passwordHash).then((val) => {
       if (val) return res.json(user).status(201).end();

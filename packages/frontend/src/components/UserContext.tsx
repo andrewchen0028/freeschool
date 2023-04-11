@@ -4,6 +4,7 @@ import { User } from 'shared-data';
 export const UserContext = createContext({
     user: {
         id: -1,
+        email: "",
         username: ""
     },
 });

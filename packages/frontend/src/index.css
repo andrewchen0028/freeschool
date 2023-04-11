@@ -51,3 +51,8 @@
     @apply bg-slate-800 rounded-xl
   }
 }
+
+.password-text {
+  -webkit-text-security: disc;
+  text-security: disc;
+}

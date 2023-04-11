@@ -10,6 +10,7 @@ import { User } from "shared-data";
 export default function LogIn() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
+    const [idMethod, setIdMethod] = useState(0); // username 0, email 1
     const [password, setPassword] = useState("");
     const [errorFlag, setErrorFlag] = useState(0);
 
@@ -20,9 +21,17 @@ export default function LogIn() {
         setUsername(event.target.value);
         setErrorFlag(0);
     }
+    function handleUsernameFocus(event: any) {
+        setIdMethod(0);
+        setErrorFlag(0);
+    }
 
     function handleEmailChange(event: any) {
         setEmail(event.target.value);
+        setErrorFlag(0);
+    }
+    function handleEmailFocus(event: any) {
+        setIdMethod(1);
         setErrorFlag(0);
     }
 
@@ -33,17 +42,32 @@ export default function LogIn() {
 
     function handleSubmit(event: any) {
         event.preventDefault();
-
-        axios.post(`${url}/logIn`, {
-            username: username,
-            password: password
-        }).then((response) => {
-            user.id = response.data.id;
-            user.username = response.data.username;
-            navigate("/");
-        }).catch((error) => {
-            setErrorFlag(error.response.status);
-        });
+        if (idMethod === 0) {
+            axios.post(`${url}/logInUsername`, {
+                username: username,
+                password: password
+            }).then((response) => {
+                user.id = response.data.id;
+                user.email = response.data.email;
+                user.username = response.data.username;
+                navigate("/");
+            }).catch((error) => {
+                setErrorFlag(error.response.status);
+            });
+        } else if (idMethod === 1) {
+            axios.post(`${url}/logInEmail`, {
+                email: email,
+                password: password
+            }).then((response) => {
+                user.id = response.data.id;
+                user.email = response.data.email;
+                user.username = response.data.username;
+                navigate("/");
+            }).catch((error) => {
+                setErrorFlag(error.response.status);
+            });
+        }
+        
     }
 
     return (
@@ -57,11 +81,13 @@ export default function LogIn() {
                     <div className="flex flex-row items-center">
                         <input id="username" className="text-input"
                             placeholder="Username" required={true}
-                            value={username} onChange={handleUsernameChange} />
+                            value={username} onChange={handleUsernameChange}
+                            onFocus={handleUsernameFocus} />
                         Or
                         <input id="email" className="text-input"
                             placeholder="Email" required={true}
-                            value={email} onChange={handleEmailChange} />
+                            value={email} onChange={handleEmailChange} 
+                            onFocus={handleEmailFocus}/>
                     </div>
                     {/* TODO-high: make all errorflags default to 0,
             and switch to label-based error handling */}
@@ -73,7 +99,7 @@ export default function LogIn() {
                             || <p>{`Unrecognized HTTP response: ${errorFlag}`}</p>} />
                     <input className="text-input" placeholder="Password" required={true}
                         value={password} onChange={handlePasswordChange} />
-                    <button className="button" type="submit" children="Log In" />
+                    <button className="button" type="submit" children={`Log in with ${idMethod === 0 ? "username" : "email"}`} />
                 </form>
                 {/* <button className="button w-48" children="(dev) log users"
                     onClick={() => {

@@ -11,5 +11,6 @@ export interface Link extends LinkObject {
 
 export interface User {
   id: number,
+  email: string,
   username: string,
 }
